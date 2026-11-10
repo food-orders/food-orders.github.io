@@ -68,6 +68,20 @@ main{max-width:1200px;margin:0 auto;padding:12px 16px}
 button{transition:transform .18s cubic-bezier(.3,1.4,.5,1),box-shadow .18s,filter .18s,background-color .18s}
 @media(hover:hover){button:not(:disabled):hover{transform:translateY(-1px) scale(1.04);box-shadow:0 3px 10px rgba(0,0,0,.12);filter:brightness(1.05)}nav.tabs button:not(:disabled):hover,.sub button:not(:disabled):hover{transform:none;box-shadow:none;filter:none;background-color:var(--surf3)}nav.tabs button.on:not(:disabled):hover,.sub button.on:not(:disabled):hover{background-color:var(--pc);filter:brightness(.97)}.sub button.on:not(:disabled):hover{background-color:var(--primary)}}
 button:not(:disabled):active{transform:scale(.92);box-shadow:none;transition-duration:.08s}
+.mascot{display:none}
+@media(min-width:1560px) and (hover:hover) and (pointer:fine){body.onorder .mascot{display:block;position:fixed;top:calc(50% + 18px);z-index:5;width:min(480px,calc((100vw - 1200px)/2 - 44px),calc(100vh - 230px));aspect-ratio:1;transform:translateY(-50%);cursor:zoom-in}
+.mascot.l{left:22px}.mascot.r{right:22px}
+.mascot .mi{position:relative;width:100%;height:100%;animation:mSway 5s ease-in-out infinite;transition:transform .2s}
+.mascot.r .mi{animation-delay:-2.5s}
+.mascot:hover .mi{animation:mWiggle .35s ease-in-out infinite}
+.mascot img,.mascot svg{position:absolute;inset:0;width:100%;height:100%;border-radius:18%;display:block}
+.mascot img{box-shadow:0 18px 50px rgba(0,0,0,.28)}
+.mascot.r img,.mascot.r svg{transform:scaleX(-1)}
+.mascot .lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(0);transition:transform .07s}
+.mascot.blink .lid{transform:scaleY(1)}}
+@keyframes mSway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@keyframes mWiggle{0%,100%{transform:rotate(-5deg) scale(1.04)}50%{transform:rotate(5deg) scale(1.04)}}
+@media(prefers-reduced-motion:reduce){.mascot .mi,.mascot:hover .mi{animation:none}}
 @media(prefers-reduced-motion:reduce){button,button:hover,button:active{transition:none!important;transform:none!important}}
 .i-cost{margin-top:8px;font-size:14px;color:var(--on2)}
 .case{margin-top:10px;border-radius:14px;padding:8px 12px;font-size:13px;background:var(--surf2);color:var(--on2)}
@@ -129,6 +143,7 @@ h3{margin:18px 0 6px}
   <button class="ibtn" id="themeBtn" title="Theme">☾</button>
 </div></header>
 <main id="main"></main>
+<div class="mascot l" data-logobig aria-hidden="true"></div><div class="mascot r" data-logobig aria-hidden="true"></div>
 <div id="costbar" class="costbar hide"></div>
 <div class="overlay" id="ov"><div class="modal" id="modal"></div></div>
 <div class="toast" id="toast"></div>
@@ -266,9 +281,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=16; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_VERSION=17; // build number (= sw.js cache shranck-shell-vN); users see the label
 const APP_LABEL='1.3';
-const PATCH_NOTES=[{v:16,label:'1.3',date:'2026-11-10',title:'Table view + locking',notes:['Bigger logo — tap it to see it full size','Home-screen icon is now the logo too','App name is now Schrank App',"Tap “🔒 I'm done” at the bottom to lock your order; tap Unlock to change it, until the admin locks everyone",'Admin: “Lock everyone” button at the top, and a 🔒 next to people who are done','Order page: switch between Cards and a compact Table view (top right)','Table shows price, per-unit cost, your order, your cost and case status in one row per item','Your choice is remembered on this device']},{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Schrank App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const PATCH_NOTES=[{v:17,label:'1.3',date:'2026-11-10',title:'Table view + locking',notes:['On big desktop screens, two giant mascots watch you from the sides of the Order page (their eyes follow your mouse)','Bigger logo — tap it to see it full size','Home-screen icon is now the logo too','App name is now Schrank App',"Tap “🔒 I'm done” at the bottom to lock your order; tap Unlock to change it, until the admin locks everyone",'Admin: “Lock everyone” button at the top, and a 🔒 next to people who are done','Order page: switch between Cards and a compact Table view (top right)','Table shows price, per-unit cost, your order, your cost and case status in one row per item','Your choice is remembered on this device']},{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Schrank App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,ORDER_VIEW=(()=>{try{return localStorage.getItem('shranck_view')==='table'?'table':'cards'}catch(e){return 'cards'}})(),TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
@@ -346,8 +361,24 @@ function openNameModal(){
 
 /* ---- modal ---- */
 let onModalClose=null;
+/* giant desktop mascots: pupils follow the mouse (right one is mirrored) */
+const EYES=[{c:[247.5,216.5],p:[243.8,216.3],m:[19,13],lid:[28.5,24]},{c:[342,217.5],p:[338,217],m:[16,13],lid:[27,23.5]}];
+function initMascots(){
+  const ms=[...document.querySelectorAll('.mascot')];if(!ms.length)return;
+  const svg=EYES.map((e,i)=>`<circle cx="${e.p[0]}" cy="${e.p[1]}" r="8.5" fill="#fff"/><circle class="pu" data-e="${i}" cx="${e.p[0]}" cy="${e.p[1]}" r="6.5" fill="#111"/><ellipse class="lid" cx="${e.c[0]}" cy="${e.c[1]}" rx="${e.lid[0]}" ry="${e.lid[1]}" fill="#f8cf01"/>`).join('');
+  ms.forEach(m=>{m.innerHTML=`<div class="mi"><img src="logo-512.jpg" alt=""><svg viewBox="0 0 512 512">${svg}</svg></div>`;
+    const blink=()=>{m.classList.add('blink');setTimeout(()=>m.classList.remove('blink'),150);setTimeout(blink,2500+Math.random()*4500)};setTimeout(blink,1500+Math.random()*3000)});
+  let mx=innerWidth/2,my=innerHeight/2,q=0;
+  const upd=()=>{q=0;ms.forEach(m=>{if(!m.offsetWidth)return;const flip=m.classList.contains('r');
+    m.querySelectorAll('.pu').forEach(pu=>{const e=EYES[+pu.dataset.e];pu.setAttribute('cx',e.p[0]);pu.setAttribute('cy',e.p[1]);
+      const b=pu.getBoundingClientRect(),dx=mx-(b.left+b.width/2),dy=my-(b.top+b.height/2),d=Math.hypot(dx,dy)||1,t=Math.min(1,d/180);
+      pu.setAttribute('cx',e.c[0]+(flip?-1:1)*dx/d*e.m[0]*t);pu.setAttribute('cy',e.c[1]+dy/d*e.m[1]*t)})})};
+  document.addEventListener('mousemove',ev=>{mx=ev.clientX;my=ev.clientY;if(!q)q=requestAnimationFrame(upd)});
+  addEventListener('resize',()=>{if(!q)q=requestAnimationFrame(upd)});
+}
 function showLogo(){openModal(`<img class="logobig" src="logo-512.jpg" alt="Schrank App logo"><div class="row2" style="justify-content:center;margin-top:16px"><button class="btn" onclick="closeModal()">Close</button></div>`)}
 document.addEventListener('click',e=>{if(e.target.closest('#logoBtn,[data-logobig]'))showLogo()});
+initMascots();
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.id==='logoBtn'){e.preventDefault();showLogo()}});
 function openModal(html,mount){onModalClose=null;NAME_OPEN=false;$('#modal').innerHTML=html;$('#ov').classList.add('open');mount&&mount()}
 function closeModal(){const wasOpen=$('#ov').classList.contains('open');NAME_OPEN=false;$('#ov').classList.remove('open');$('#modal').innerHTML='';const f=onModalClose;onModalClose=null;if(wasOpen&&f)f();setTimeout(flushPending,60)}
@@ -361,7 +392,7 @@ $('#themeBtn').onclick=()=>{const t=document.documentElement.getAttribute('data-
 
 /* ---- rendering ---- */
 function renderAll(){
-  document.body.classList.toggle('admin',ADM);
+  document.body.classList.toggle('admin',ADM);document.body.classList.toggle('onorder',TAB==='order');
   $('#admBtn').textContent=ADM?'🔓':'🔒';$('#admBtn').disabled=!READY;$('#admBtn').title=READY?'Admin':'Connecting…';
   const m=me();$('#meBtn').textContent=m?'👤 '+S.people[m].name:READY?'👤 Who are you?':'Connecting…';$('#meBtn').disabled=!READY;
   const tabs=[['order','Order'],...(ADM?[['admin','Admin']]:[]),['help','Help']];
