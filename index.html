@@ -50,10 +50,14 @@ main{max-width:1100px;margin:0 auto;padding:8px 16px}
 .i-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .i-name{font-weight:700;font-size:17px}.i-price{font-weight:700;color:var(--primary);white-space:nowrap}
 .i-sub{color:var(--on2);font-size:13px;margin:2px 0 10px}
-.stepper{display:flex;align-items:center;gap:8px}
-.stepper button{width:44px;height:44px;border-radius:50%;background:var(--pc);color:var(--onpc);font-size:22px;font-weight:700}
+.stepper{display:flex;align-items:center;gap:12px}
+.stepper button{width:44px;height:44px;border-radius:50%;background:var(--pc);color:var(--onpc);font-size:24px;font-weight:700;line-height:1;padding:0 0 2px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 .stepper input{width:76px;text-align:center;font-size:20px;font-weight:700;padding:8px}
-.stepper .u{color:var(--on2);font-size:14px}
+.stepper .u{color:var(--on2);font-size:14px;margin-left:2px}
+button{transition:transform .18s cubic-bezier(.3,1.4,.5,1),box-shadow .18s,filter .18s,background-color .18s}
+@media(hover:hover){button:not(:disabled):hover{transform:translateY(-2px) scale(1.06);box-shadow:0 4px 12px rgba(0,0,0,.22);filter:brightness(1.07)}nav.tabs button:not(:disabled):hover,.sub button:not(:disabled):hover{transform:translateY(-1px) scale(1.04);box-shadow:0 2px 8px rgba(0,0,0,.18)}}
+button:not(:disabled):active{transform:scale(.92);box-shadow:none;transition-duration:.08s}
+@media(prefers-reduced-motion:reduce){button,button:hover,button:active{transition:none!important;transform:none!important}}
 .i-cost{margin-top:8px;font-size:14px;color:var(--on2)}
 .case{margin-top:10px;border-radius:14px;padding:8px 12px;font-size:13px;background:var(--surf2);color:var(--on2)}
 .case.ok{background:var(--okc);color:var(--ok);font-weight:600}.case.warn{background:var(--warnc);color:var(--warn)}
@@ -238,9 +242,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=3; // build number (= sw.js cache shranck-shell-vN); users see the label
-const APP_LABEL='1.1';
-const PATCH_NOTES=[{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Shranck App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const APP_VERSION=4; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_LABEL='1.2';
+const PATCH_NOTES=[{v:4,label:'1.2',date:'2026-11-10',title:'Nicer buttons',notes:['Quantity − / + buttons are now evenly spaced with centered symbols','Buttons animate when you hover or press them']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Shranck App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
