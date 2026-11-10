@@ -59,7 +59,7 @@ main{max-width:1200px;margin:0 auto;padding:12px 16px}
 .stepper button:disabled{opacity:.35;cursor:default}
 .stepper .u{color:var(--on2);font-size:14px;margin-left:2px}
 button{transition:transform .18s cubic-bezier(.3,1.4,.5,1),box-shadow .18s,filter .18s,background-color .18s}
-@media(hover:hover){button:not(:disabled):hover{transform:translateY(-2px) scale(1.06);box-shadow:0 4px 12px rgba(0,0,0,.22);filter:brightness(1.07)}nav.tabs button:not(:disabled):hover,.sub button:not(:disabled):hover{transform:translateY(-1px) scale(1.04);box-shadow:0 2px 8px rgba(0,0,0,.18)}}
+@media(hover:hover){button:not(:disabled):hover{transform:translateY(-1px) scale(1.04);box-shadow:0 3px 10px rgba(0,0,0,.12);filter:brightness(1.05)}nav.tabs button:not(:disabled):hover,.sub button:not(:disabled):hover{transform:none;box-shadow:none;filter:none;background-color:var(--surf3)}nav.tabs button.on:not(:disabled):hover,.sub button.on:not(:disabled):hover{background-color:var(--pc);filter:brightness(.97)}.sub button.on:not(:disabled):hover{background-color:var(--primary)}}
 button:not(:disabled):active{transform:scale(.92);box-shadow:none;transition-duration:.08s}
 @media(prefers-reduced-motion:reduce){button,button:hover,button:active{transition:none!important;transform:none!important}}
 .i-cost{margin-top:8px;font-size:14px;color:var(--on2)}
@@ -248,9 +248,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=6; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_VERSION=7; // build number (= sw.js cache shranck-shell-vN); users see the label
 const APP_LABEL='1.2';
-const PATCH_NOTES=[{v:6,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are now evenly spaced with centered symbols','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Shranck App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const PATCH_NOTES=[{v:7,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are now evenly spaced with centered symbols','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Shranck App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
