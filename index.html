@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shranck App</title>
+<meta name="theme-color" content="#006a6b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.png" type="image/png">
+<script>try{var t=localStorage.getItem('shranck_theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<style>
+:root{--bg:#f4fbfa;--surf:#ffffff;--surf2:#e6f2f1;--surf3:#d4e8e7;--on:#141d1d;--on2:#3f4948;--line:#bec9c8;--primary:#006a6b;--onprimary:#fff;--pc:#9cf1f2;--onpc:#002020;--ok:#1b6c33;--okc:#b4f1bf;--warn:#8a5100;--warnc:#ffddb4;--err:#ba1a1a;--errc:#ffdad6;--shadow:0 1px 3px rgba(0,0,0,.14),0 4px 14px rgba(0,0,0,.06)}
+[data-theme=dark]{--bg:#0e1514;--surf:#161d1d;--surf2:#1f2a29;--surf3:#2a3736;--on:#dde4e3;--on2:#a9b5b4;--line:#3f4948;--primary:#4cd9db;--onprimary:#003737;--pc:#004f50;--onpc:#9cf1f2;--ok:#99d5a1;--okc:#06391b;--warn:#ffb867;--warnc:#4b2b00;--err:#ffb4ab;--errc:#5a1a14;--shadow:0 1px 3px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--on);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:96px}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+input,select,textarea{font:inherit;color:var(--on);background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);outline-offset:0;border-color:transparent}
+header{position:sticky;top:0;z-index:20;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+header h1{font-size:20px;margin:0;font-weight:700;letter-spacing:-.2px;flex:1;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+header .pill,header .ibtn{flex-shrink:0}
+#meBtn{max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;line-height:40px}
+@media(max-width:420px){header{gap:6px;padding:10px 12px}}
+.pill{font-size:12px;padding:4px 10px;border-radius:99px;background:var(--surf2);color:var(--on2)}
+.pill.on{background:var(--okc);color:var(--ok)}.pill.err{background:var(--errc);color:var(--err)}
+.ibtn{width:40px;height:40px;border-radius:50%;background:var(--surf2);font-size:18px;display:grid;place-items:center}
+.btn{padding:10px 18px;border-radius:99px;background:var(--primary);color:var(--onprimary);font-weight:600}
+.btn.tonal{background:var(--pc);color:var(--onpc)}.btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--line)}
+.btn.danger{background:var(--errc);color:var(--err)}.btn.sm{padding:6px 12px;font-size:14px}
+.btn:disabled{opacity:.45;cursor:default}
+nav.tabs{display:flex;gap:6px;padding:8px 16px;overflow-x:auto}
+nav.tabs button{padding:8px 16px;border-radius:99px;background:transparent;color:var(--on2);white-space:nowrap;font-weight:600}
+nav.tabs button.on{background:var(--pc);color:var(--onpc)}
+main{max-width:1100px;margin:0 auto;padding:8px 16px}
+.hide{display:none!important}
+.adminonly{display:none}body.admin .adminonly{display:revert}
+.banner{background:var(--surf2);border-radius:20px;padding:14px 16px;margin:10px 0;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+.banner b{font-size:18px}.banner .d{display:flex;gap:6px;align-items:center}
+.card{background:var(--surf);border-radius:24px;padding:16px;box-shadow:var(--shadow);margin:10px 0}
+.blocktitle{font-size:22px;font-weight:700;margin:22px 0 4px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.items .card{margin:0}
+.i-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.i-name{font-weight:700;font-size:17px}.i-price{font-weight:700;color:var(--primary);white-space:nowrap}
+.i-sub{color:var(--on2);font-size:13px;margin:2px 0 10px}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper button{width:44px;height:44px;border-radius:50%;background:var(--pc);color:var(--onpc);font-size:22px;font-weight:700}
+.stepper input{width:76px;text-align:center;font-size:20px;font-weight:700;padding:8px}
+.stepper .u{color:var(--on2);font-size:14px}
+.i-cost{margin-top:8px;font-size:14px;color:var(--on2)}
+.case{margin-top:10px;border-radius:14px;padding:8px 12px;font-size:13px;background:var(--surf2);color:var(--on2)}
+.case.ok{background:var(--okc);color:var(--ok);font-weight:600}.case.warn{background:var(--warnc);color:var(--warn)}
+.bar{height:6px;border-radius:9px;background:var(--surf3);margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:currentColor;border-radius:9px}
+.costbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surf);border-top:1px solid var(--line);box-shadow:0 -4px 18px rgba(0,0,0,.12);padding:10px 16px}
+.costbar .in{max-width:1100px;margin:0 auto}
+.costbar .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.costbar .tot{font-size:24px;font-weight:800;color:var(--primary)}
+.costbar .brk{max-height:36vh;overflow:auto;margin-top:8px;font-size:14px}
+.brk div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line)}
+.note{color:var(--on2);font-size:12px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--surf);border-radius:28px;padding:22px;max-width:560px;width:100%;max-height:90vh;overflow:auto}
+.modal h2{margin:0 0 10px;font-size:20px}
+.field{display:flex;flex-direction:column;gap:4px;margin:8px 0}.field label{font-size:12px;color:var(--on2);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{padding:8px 14px;border-radius:99px;background:var(--surf2);font-weight:600}
+.row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sub{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}.sub button{padding:6px 14px;border-radius:99px;background:var(--surf2);font-weight:600}.sub button.on{background:var(--primary);color:var(--onprimary)}
+.tw{overflow:auto;border-radius:18px;border:1px solid var(--line);background:var(--surf)}
+table.g{border-collapse:collapse;width:100%;font-size:14px}
+table.g th,table.g td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+table.g th{background:var(--surf2);position:sticky;top:0;font-size:12px;white-space:normal;min-width:96px;vertical-align:bottom}
+table.g td:first-child,table.g th:first-child{text-align:left;position:sticky;left:0;background:var(--surf2);z-index:2;min-width:120px}
+table.g td:first-child{background:var(--surf)}
+table.g input{width:62px;padding:5px;text-align:center;border-radius:8px}
+table.g tr.foot td{background:var(--surf2);font-weight:700}
+td.bad{background:var(--warnc)!important;color:var(--warn)}td.good{color:var(--ok)}
+.itemrow{display:grid;grid-template-columns:2fr 2fr 1fr 1fr 1fr 1fr 1fr auto;gap:6px;align-items:end;margin:8px 0;padding:10px;background:var(--surf2);border-radius:16px}
+@media(max-width:760px){.itemrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.itemrow .field{margin:0;min-width:0}.itemrow .field input{width:100%}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:var(--on);color:var(--bg);padding:10px 18px;border-radius:99px;z-index:90;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1}
+.pn{border-left:4px solid var(--line);padding:6px 12px;margin:10px 0}.pn.cur{border-color:var(--primary)}
+h3{margin:18px 0 6px}
+.empty{padding:30px;text-align:center;color:var(--on2)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🛒 Shranck App</h1>
+  <span id="sync" class="pill">Connecting…</span>
+  <button class="ibtn" id="meBtn" title="Who am I" style="width:auto;border-radius:99px;padding:0 14px;font-size:14px;font-weight:600"></button>
+  <button class="ibtn" id="admBtn" title="Admin">🔓</button>
+  <button class="ibtn" id="themeBtn" title="Theme">☾</button>
+</header>
+<nav class="tabs" id="tabs"></nav>
+<main id="main"></main>
+<div id="costbar" class="costbar hide"></div>
+<div class="overlay" id="ov"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// <core>
+const EPS=1e-6;
+function arr(x){return Array.isArray(x)?x.filter(v=>v!=null):(x&&typeof x==='object'?Object.keys(x).sort((a,b)=>a-b).map(k=>x[k]).filter(v=>v!=null):[])}
+function num(v){const n=parseFloat(v);return Number.isFinite(n)&&n>0?Math.round(n*1e4)/1e4:0}
+function r4(x){return Math.round(x*1e4)/1e4}
+function uid(p){return (p||'i')+Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-3)}
+// ids from the (publicly writable) DB end up in HTML attributes and write paths: only allow safe ones
+function validId(s){return typeof s==='string'&&/^[\w-]{1,64}$/.test(s)}
+// round a typed quantity to the nearest multiple of the item's step (min 0)
+function snapQty(q,step){const s=num(step)||1;return num(Math.round(num(q)/s)*s)}
+// set obj[a][b][c]=v along "a/b/c", creating objects; v==null deletes the leaf
+function setPath(obj,path,v){const ks=path.split('/');let o=obj;for(let i=0;i<ks.length-1;i++){if(!o[ks[i]]||typeof o[ks[i]]!=='object')o[ks[i]]={};o=o[ks[i]]}const k=ks[ks.length-1];if(v==null)delete o[k];else o[k]=v;return obj}
+// drop duplicate paths and any path whose ancestor is also present (Firebase update() rejects overlapping paths)
+function compactPaths(paths){const u=[...new Set(paths)];return u.filter(p=>!u.some(q=>q!==p&&p.startsWith(q+'/')))}
+function mkItem(o){return Object.assign({id:uid('i'),name:'',uom:'',coo:'',unit:'unit',costPerLb:null,lbsPerUnit:1,incPerCase:1,step:1},o||{})}
+function normItem(i){
+  i=i&&typeof i==='object'?i:{};
+  const p=(i.costPerLb===''||i.costPerLb==null)?null:parseFloat(i.costPerLb);
+  const lbs=parseFloat(i.lbsPerUnit),inc=parseFloat(i.incPerCase),st=parseFloat(i.step);
+  return {id:String(i.id||uid('i')),name:String(i.name||''),uom:String(i.uom||''),coo:String(i.coo||''),unit:String(i.unit||'unit'),
+    costPerLb:Number.isFinite(p)&&p>=0?p:null,lbsPerUnit:Number.isFinite(lbs)&&lbs>0?lbs:1,incPerCase:Number.isFinite(inc)&&inc>0?inc:1,step:Number.isFinite(st)&&st>0?st:1};
+}
+function normBlock(b){
+  b=b&&typeof b==='object'?b:{};
+  return {id:String(b.id||uid('b')),title:String(b.title||'Order'),delivery:String(b.delivery||''),deadline:String(b.deadline||''),note:String(b.note||''),items:arr(b.items).map(normItem).filter(i=>validId(i.id))};
+}
+function normRound(r,id){
+  r=r&&typeof r==='object'?r:{};
+  const blocks=arr(r.blocks).map(normBlock).filter(b=>validId(b.id));
+  return {id:String(id),title:String(r.title||'Order round'),status:r.status==='locked'?'locked':'open',createdAt:Number(r.createdAt)||0,blocks,orders:r.orders&&typeof r.orders==='object'?r.orders:{}};
+}
+function normalize(raw){
+  raw=raw&&typeof raw==='object'?raw:{};
+  const S={app:'shranck',version:1,savedAt:Number(raw.savedAt)||0,adminHash:String(raw.adminHash||''),currentRoundId:'',people:{},rounds:{}};
+  const pp=raw.people&&typeof raw.people==='object'?raw.people:{};
+  Object.keys(pp).forEach(id=>{const p=pp[id];if(validId(id)&&p&&typeof p==='object'&&String(p.name||'').trim())S.people[id]={id:String(id),name:String(p.name).trim(),added:Number(p.added)||0}});
+  const rr=raw.rounds&&typeof raw.rounds==='object'?raw.rounds:{};
+  Object.keys(rr).forEach(id=>{if(validId(id))S.rounds[id]=normRound(rr[id],id)});
+  if(!Object.keys(S.rounds).length){const seed=seedState();S.rounds=seed.rounds;S.currentRoundId=seed.currentRoundId}
+  S.currentRoundId=S.rounds[raw.currentRoundId]?String(raw.currentRoundId):(S.currentRoundId&&S.rounds[S.currentRoundId]?S.currentRoundId:Object.keys(S.rounds).sort((a,b)=>S.rounds[b].createdAt-S.rounds[a].createdAt)[0]);
+  Object.keys(S.rounds).forEach(id=>{
+    const R=S.rounds[id],ids={};R.blocks.forEach(b=>b.items.forEach(i=>ids[i.id]=1));
+    const clean={};
+    Object.keys(R.orders).forEach(pid=>{
+      if(!S.people[pid]||!R.orders[pid]||typeof R.orders[pid]!=='object')return;
+      const o={};Object.keys(R.orders[pid]).forEach(iid=>{const q=num(R.orders[pid][iid]);if(ids[iid]&&q>0)o[iid]=q});
+      if(Object.keys(o).length)clean[pid]=o;
+    });
+    R.orders=clean;
+  });
+  return S;
+}
+function seedState(){
+  const m=(o)=>mkItem(o);
+  const meat={id:'b_meat',title:'Meat Order',delivery:'',deadline:'',note:'Costs will be deducted from paycheque directly',items:[
+    m({id:'i_strip',name:'Beef Striploin AAA Angus Reserve Fz Frfz',uom:'1 Piece Average 14 LB - 5 Pieces per case',unit:'piece',costPerLb:14.07,lbsPerUnit:14,incPerCase:5}),
+    m({id:'i_rib',name:'Miami Shortrib - Order by Case',uom:'AVG 11 LB/Case',unit:'case',costPerLb:11,lbsPerUnit:11,incPerCase:1,step:0.5}),
+    m({id:'i_brisket',name:'Beef Brisket AAA FZ - FRFZ - Order By Piece',uom:'1 Piece Average 15 LB - 5 Pieces per case',unit:'piece',costPerLb:6.81,lbsPerUnit:15,incPerCase:5})]};
+  const sea={id:'b_sea',title:'Seafood Order',delivery:'Thursday Nov 19th',deadline:'',note:'Costs will be deducted from paycheque directly',items:[
+    m({id:'i_tuna',name:'Tuna Saku AAA',uom:'8-10 oz Pieces - 10 LB Case',coo:'Vietnam',unit:'case',costPerLb:13.75,lbsPerUnit:10,incPerCase:1}),
+    m({id:'i_bt812',name:'Black Tiger Shrimp PDTO (8/12)',uom:'5x2 lb Case',coo:'India',unit:'2 lb bag',costPerLb:14.25,lbsPerUnit:2,incPerCase:5}),
+    m({id:'i_bt1620',name:'Black Tiger Shrimp PDTO (16/20)',uom:'5x2 lb Case',coo:'India',unit:'2 lb bag',costPerLb:13.25,lbsPerUnit:2,incPerCase:5}),
+    m({id:'i_v1620',name:'Vannamei Shrimp PDTO (16/20)',uom:'5x2 lb Case',coo:'India',unit:'2 lb bag',costPerLb:8.95,lbsPerUnit:2,incPerCase:5}),
+    m({id:'i_v2125',name:'Vannamei Shrimp PDTO (21/25)',uom:'5x2 lb Case',coo:'India',unit:'2 lb bag',costPerLb:8.25,lbsPerUnit:2,incPerCase:5}),
+    m({id:'i_pick',name:'Wild Ontario Pickerel - individual Vac Pack - Order By Case',uom:'5-6 oz Pieces - 11lb Case',unit:'case',costPerLb:null,lbsPerUnit:11,incPerCase:1})]};
+  const r={id:'r_nov2026',title:'Nov 2026',status:'open',createdAt:1762732800000,blocks:[meat,sea],orders:{}};
+  return {app:'shranck',version:1,savedAt:0,adminHash:'',currentRoundId:r.id,people:{},rounds:{[r.id]:r}};
+}
+function findItem(round,itemId){for(const b of round.blocks)for(const i of b.items)if(i.id===itemId)return i;return null}
+function personCost(round,pid){
+  const lines=[];let total=0;const o=(round.orders&&round.orders[pid])||{};
+  round.blocks.forEach(b=>b.items.forEach(i=>{
+    const q=num(o[i.id]);if(!q)return;
+    const tbd=i.costPerLb==null;const c=tbd?0:r4(q*i.lbsPerUnit*i.costPerLb);
+    total+=c;lines.push({itemId:i.id,name:i.name,qty:q,cost:c,priceTbd:tbd,unit:i.unit});
+  }));
+  return {total:Math.round(total*100)/100,lines};
+}
+function itemTotals(round,itemId){
+  const it=findItem(round,itemId);const inc=it?it.incPerCase:1;let total=0;
+  Object.keys(round.orders||{}).forEach(pid=>{total+=num(round.orders[pid][itemId])});
+  total=r4(total);
+  const full=Math.floor(total/inc+EPS);let over=r4(total-full*inc);if(over<EPS||inc-over<EPS){over=0}
+  const aligned=over===0;const fc=aligned?Math.round(total/inc):full;
+  return {total,inc,cases:r4(total/inc),fullCases:fc,over,short:aligned?0:r4(inc-over),aligned};
+}
+function findPersonByName(S,name){const n=String(name||'').trim().toLowerCase();if(!n)return null;for(const id of Object.keys(S.people))if(S.people[id].name.trim().toLowerCase()===n)return id;return null}
+function setQty(S,roundId,pid,itemId,qty){
+  const R=S.rounds[roundId];if(!R)return;const q=num(qty);
+  if(!R.orders)R.orders={};
+  if(q===0){if(R.orders[pid]){delete R.orders[pid][itemId];if(!Object.keys(R.orders[pid]).length)delete R.orders[pid]}return}
+  if(!R.orders[pid])R.orders[pid]={};R.orders[pid][itemId]=q;
+}
+function deletePerson(S,id){delete S.people[id];Object.keys(S.rounds).forEach(r=>{if(S.rounds[r].orders)delete S.rounds[r].orders[id]})}
+function mergePeople(S,from,to){
+  if(from===to||!S.people[to])return;
+  Object.keys(S.rounds).forEach(r=>{const R=S.rounds[r];const o=R.orders&&R.orders[from];if(o){Object.keys(o).forEach(iid=>{const cur=num(R.orders[to]&&R.orders[to][iid]);setQty(S,r,to,iid,cur+num(o[iid]))})}});
+  deletePerson(S,from);
+}
+// </core>
+
+/* ======================= APP ======================= */
+const APP_VERSION=1;
+const PATCH_NOTES=[{v:1,date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',TAB='order',pending=null,viewBrk=false;
+// READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
+let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'$'+Number(n||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+const cur=()=>S.rounds[S.currentRoundId];
+const admRound=()=>S.rounds[ADM_RID]||cur();
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* ---- persistence ---- */
+function dataObject(){return JSON.parse(JSON.stringify(S))}
+function saveLocal(){try{localStorage.setItem('shranck_data',JSON.stringify(dataObject()))}catch(e){}}
+function getPath(p){let o=S;for(const k of p.split('/')){if(o==null)return undefined;o=o[k]}return o}
+function saveQueue(){try{if(QUEUE.size)localStorage.setItem('shranck_queue',JSON.stringify([...QUEUE]));else localStorage.removeItem('shranck_queue')}catch(e){}}
+function snapVal(p){const v=getPath(p);return v===undefined?null:JSON.parse(JSON.stringify(v))}
+function persist(paths){
+  S.savedAt=Date.now();saveLocal();
+  if(!paths||!paths.length)return; // whole-tree writes are never made (they clobber others' edits)
+  if(!window.__fbUpdate){paths.forEach(p=>QUEUE.add(p));saveQueue();return} // Firebase not ready yet: flushed on first snapshot
+  const u={};compactPaths(paths).forEach(p=>u[p]=snapVal(p));window.__fbUpdate(u);
+}
+// push edits made before Firebase was ready, re-reading their current values; returns the update object
+function flushQueue(){const u={};compactPaths([...QUEUE]).forEach(p=>u[p]=snapVal(p));QUEUE.clear();saveQueue();if(Object.keys(u).length)window.__fbUpdate(u);return u}
+function stable(o){if(Array.isArray(o))return'['+o.map(stable).join(',')+']';if(o&&typeof o==='object')return'{'+Object.keys(o).sort().filter(k=>k!=='savedAt').map(k=>JSON.stringify(k)+':'+stable(o[k])).join(',')+'}';return JSON.stringify(o)}
+// the name picker is NOT busy: snapshots apply under it so existing names show up live
+function busy(){const a=document.activeElement;return ($('#ov').classList.contains('open')&&!NAME_OPEN)||(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.closest('main,#costbar'))}
+function flushPending(){if(pending&&!busy()){const v=pending;pending=null;window.__applyRemote(v)}}
+function latestHash(){return pending?String(pending.adminHash||''):String(S.adminHash||'')}
+window.__setSync=st=>{const p=$('#sync');p.className='pill '+(st==='on'?'on':st==='err'?'err':'');p.textContent=st==='on'?'Live · shared':st==='err'?'Offline':'Local';if(st==='err')markReady()};
+function markReady(){
+  if(READY)return;READY=true;clearTimeout(markReady.t);
+  if($('#sync').textContent==='Connecting…')window.__setSync('local');
+  renderAll();
+  if(!me()&&!$('#ov').classList.contains('open'))openNameModal();
+}
+markReady.t=setTimeout(markReady,4000); // local-only fallback so the app stays usable without Firebase
+window.__applyRemote=val=>{
+  if(val==null){markReady();if(window.__fbSeed)window.__fbSeed(seedState());return} // seed only if still empty (transaction), never with local data
+  if(QUEUE.size&&window.__fbUpdate){const u=flushQueue();val=JSON.parse(JSON.stringify(val));Object.keys(u).forEach(p=>setPath(val,p,u[p]))}
+  if(PENDING_PIN&&window.__fbSetIfEmpty){const h=PENDING_PIN;PENDING_PIN=null;window.__fbSetIfEmpty('adminHash',h).then(ok=>{if(!ok){toast('An admin PIN already exists — use that PIN');if(ADM){ADM=false;try{sessionStorage.removeItem('shranck_admin')}catch(e){}TAB='order';renderAll()}}}).catch(()=>{})}
+  remoteLoaded=true;
+  if(busy()){pending=val;markReady();return}
+  pending=null; // a newer snapshot supersedes any deferred one (else flushPending would re-apply stale data over the user's edit)
+  const n=normalize(val);
+  if(stable(n)!==stable(S)){S=n;saveLocal();validateMe();renderAll();if(NAME_OPEN)renderNameChips()}
+  markReady();
+};
+document.addEventListener('focusout',()=>setTimeout(flushPending,60));
+
+/* ---- identity ---- */
+function me(){return ME&&S.people[ME]?ME:null}
+function validateMe(){if(ME&&!S.people[ME])ME=null}
+function setMe(id){ME=id;try{localStorage.setItem('shranck_me',id)}catch(e){}renderAll()}
+// chip list only, so a live re-render keeps whatever the user is typing in #nm
+function renderNameChips(){
+  const el=$('#nmList');if(!el)return;
+  const people=Object.values(S.people).sort((a,b)=>a.name.localeCompare(b.name));
+  el.innerHTML=people.length?`<div class="note">Tap your name if it's already here:</div><div class="chips">${people.map(p=>`<button class="chip" data-pick="${esc(p.id)}">${esc(p.name)}</button>`).join('')}</div><div class="note">Not in the list? Type your name:</div>`:`<div class="note">Type your name — you only need to do this once.</div>`;
+  el.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{closeModal();setMe(b.dataset.pick)});
+}
+function openNameModal(){
+  if(!READY)return;
+  openModal(`<h2>Who are you?</h2><div id="nmList"></div>
+  <div class="field"><input id="nm" placeholder="Your name" maxlength="40" autocomplete="off"></div>
+  <div class="row2" style="justify-content:flex-end"><button class="btn ghost" id="nmX">Just looking</button><button class="btn" id="nmOk">Continue</button></div>`,()=>{
+    NAME_OPEN=true;renderNameChips();
+    const go=()=>{const v=$('#nm').value.trim();if(!v)return;
+      // re-check against the newest data (incl. any held-back snapshot) so we never create a duplicate person
+      const ex=findPersonByName(S,v)||(pending?findPersonByName(normalize(pending),v):null);closeModal();
+      if(ex){if(!S.people[ex]&&pending)flushPending();setMe(ex);return}
+      const id=uid('p');S.people[id]={id,name:v,added:Date.now()};persist(['people/'+id]);setMe(id)};
+    $('#nmOk').onclick=go;$('#nm').onkeydown=e=>{if(e.key==='Enter')go()};$('#nmX').onclick=closeModal;setTimeout(()=>{const n=$('#nm');if(n)n.focus()},50)});
+}
+
+/* ---- modal ---- */
+let onModalClose=null;
+function openModal(html,mount){onModalClose=null;NAME_OPEN=false;$('#modal').innerHTML=html;$('#ov').classList.add('open');mount&&mount()}
+function closeModal(){const wasOpen=$('#ov').classList.contains('open');NAME_OPEN=false;$('#ov').classList.remove('open');$('#modal').innerHTML='';const f=onModalClose;onModalClose=null;if(wasOpen&&f)f();setTimeout(flushPending,60)}
+$('#ov').addEventListener('mousedown',e=>{if(e.target.id==='ov')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+function confirmBox(msg,okLabel,cb,danger){openModal(`<h2>Please confirm</h2><div style="white-space:pre-line">${esc(msg)}</div><div class="row2" style="justify-content:flex-end;margin-top:16px"><button class="btn ghost" id="cX">Cancel</button><button class="btn ${danger?'danger':''}" id="cOk">${esc(okLabel)}</button></div>`,()=>{$('#cX').onclick=closeModal;$('#cOk').onclick=()=>{closeModal();cb()}})}
+
+/* ---- theme ---- */
+function applyThemeBtn(){const t=document.documentElement.getAttribute('data-theme');$('#themeBtn').textContent=t==='dark'?'☀':'☾'}
+$('#themeBtn').onclick=()=>{const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('shranck_theme',t)}catch(e){}applyThemeBtn()};
+
+/* ---- rendering ---- */
+function renderAll(){
+  document.body.classList.toggle('admin',ADM);
+  $('#admBtn').textContent=ADM?'🔒':'🔓';$('#admBtn').disabled=!READY;$('#admBtn').title=READY?'Admin':'Connecting…';
+  const m=me();$('#meBtn').textContent=m?'👤 '+S.people[m].name:READY?'👤 Who are you?':'Connecting…';$('#meBtn').disabled=!READY;
+  const tabs=[['order','Order'],...(ADM?[['admin','Admin']]:[]),['help','Help']];
+  if(!tabs.some(t=>t[0]===TAB))TAB='order';
+  $('#tabs').innerHTML=tabs.map(t=>`<button data-tab="${esc(t[0])}" class="${TAB===t[0]?'on':''}">${t[1]}</button>`).join('');
+  if(TAB==='order')renderOrder();else if(TAB==='admin')renderAdmin();else renderHelp();
+  renderCostBar();
+}
+$('#tabs').onclick=e=>{const b=e.target.closest('[data-tab]');if(b){TAB=b.dataset.tab;renderAll()}};
+$('#meBtn').onclick=openNameModal;
+
+function caseInfo(t,it){
+  const u=it.unit||'unit';
+  if(!t.total)return {cls:'',html:`No orders yet · ${t.inc>1?t.inc+' per case':'1 '+esc(u)+' = 1 case'}`,pct:0};
+  if(t.aligned)return {cls:'ok',html:`✓ ${t.total} ${esc(u)}${t.total===1?'':'s'} = ${t.fullCases} case${t.fullCases===1?'':'s'} — lines up`,pct:100};
+  const next=(t.fullCases+1)*t.inc;
+  return {cls:'warn',html:`${t.total} of ${next} for ${t.fullCases+1} case${t.fullCases?'s':''} · <b>${t.short} short</b>`+(t.fullCases>0?` <span style="opacity:.8">(or ${t.over} over ${t.fullCases} case${t.fullCases===1?'':'s'})</span>`:''),pct:Math.round(t.over/t.inc*100)};
+}
+function itemCard(R,b,it,editable){
+  const t=itemTotals(R,it.id),ci=caseInfo(t,it),q=num(R.orders[me()]&&R.orders[me()][it.id]);
+  const unitCost=it.costPerLb==null?null:it.lbsPerUnit*it.costPerLb;
+  return `<div class="card"><div class="i-head"><div class="i-name">${esc(it.name)}</div><div class="i-price">${it.costPerLb==null?'<span style="color:var(--warn)">price TBD</span>':money(it.costPerLb)+'/lb'}</div></div>
+  <div class="i-sub">${esc(it.uom)}${it.coo?' · '+esc(it.coo):''}${unitCost!=null?` · ≈ ${money(unitCost)} per ${esc(it.unit)}`:''}</div>
+  <div class="stepper"><button data-dec="${esc(it.id)}" ${editable?'':'disabled'} aria-label="less">−</button><input type="number" inputmode="decimal" min="0" step="${esc(it.step)}" value="${esc(q||'')}" placeholder="0" data-qty="${esc(it.id)}" ${editable?'':'disabled'}><button data-inc="${esc(it.id)}" ${editable?'':'disabled'} aria-label="more">+</button><span class="u">${esc(it.unit)}${it.step<1?' (halves ok)':''}</span></div>
+  <div class="i-cost">${q?`Your cost: <b>${it.costPerLb==null?'TBD':money(q*unitCost)}</b>`:'&nbsp;'}</div>
+  <div class="case ${ci.cls}">${ci.html}<div class="bar"><i style="width:${ci.pct}%"></i></div></div></div>`;
+}
+function renderOrder(){
+  const R=cur(),locked=R.status==='locked',m=me(),editable=!!m&&!locked&&READY;
+  let h=`<div class="note" style="margin-top:8px">${esc(R.title)}${locked?' · 🔒 ordering is closed':''}</div>`;
+  if(!m)h+=`<div class="card"><b>Pick your name to start ordering.</b><div style="margin-top:10px"><button class="btn" id="nameStart" ${READY?'':'disabled'}>${READY?'Who are you?':'Connecting…'}</button></div></div>`;
+  R.blocks.forEach(b=>{
+    h+=`<div class="blocktitle">${esc(b.title)}</div><div class="banner"><div class="d">📅 <span>Delivery:</span> <b>${esc(b.delivery||'TBD')}</b></div>${b.deadline?`<div class="d">⏰ <span>Order by:</span> <b>${esc(b.deadline)}</b></div>`:''}${b.note?`<div class="note" style="flex-basis:100%">${esc(b.note)}</div>`:''}</div>`;
+    h+=`<div class="items">${b.items.map(it=>itemCard(R,b,it,editable)).join('')||'<div class="empty">No items yet.</div>'}</div>`;
+  });
+  $('#main').innerHTML=h;
+  const ns=$('#nameStart');if(ns)ns.onclick=openNameModal;
+}
+function renderCostBar(){
+  const cb=$('#costbar');
+  if(TAB!=='order'||!me()){cb.classList.add('hide');return}
+  const R=cur(),c=personCost(R,me());cb.classList.remove('hide');
+  cb.innerHTML=`<div class="in"><div class="row"><div><div class="note">Your estimated cost · deducted from paycheque</div><div class="tot">${money(c.total)}</div>${c.lines.some(l=>l.priceTbd)?'<div class="note">+ items with price TBD</div>':''}</div><button class="btn tonal sm" id="brkBtn">${viewBrk?'Hide':'Details'}</button></div>${viewBrk?`<div class="brk">${c.lines.length?c.lines.map(l=>`<div><span>${l.qty} × ${esc(l.name)}</span><span>${l.priceTbd?'TBD':money(l.cost)}</span></div>`).join(''):'<div><span>Nothing ordered yet</span><span></span></div>'}</div>`:''}</div>`;
+  $('#brkBtn').onclick=()=>{viewBrk=!viewBrk;renderCostBar()};
+}
+function changeQty(itemId,q){
+  const R=cur(),it=findItem(R,itemId);if(!me()||R.status==='locked'||!it||!READY)return;
+  // single leaf path: never push the whole (possibly stale) order map
+  setQty(S,R.id,me(),itemId,snapQty(q,it.step));persist([`rounds/${R.id}/orders/${me()}/${itemId}`]);rerenderKeepFocus();
+}
+// re-render after focus settles, then put focus back on the same control (else Tab after typing a qty drops focus to <body>)
+function rerenderKeepFocus(){setTimeout(()=>{const a=document.activeElement;let sel=null;if(a&&a.dataset)for(const k of ['qty','inc','dec','gq']){if(a.dataset[k]!=null){sel=`[data-${k}="${CSS.escape(a.dataset[k])}"]`;break}}
+  renderAll();if(sel){const n=document.querySelector(sel);if(n){n.focus();if(n.select)try{n.select()}catch(e){}}}},0)}
+$('#main').addEventListener('click',e=>{
+  const d=e.target.closest('[data-dec],[data-inc]');if(!d)return;
+  const id=d.dataset.dec||d.dataset.inc,it=findItem(cur(),id);if(!it)return;const q=num(cur().orders[me()]&&cur().orders[me()][id]);
+  changeQty(id,Math.max(0,q+(d.dataset.inc?1:-1)*it.step));
+});
+$('#main').addEventListener('change',e=>{const i=e.target.closest('[data-qty]');if(i)changeQty(i.dataset.qty,i.value)});
+
+function renderHelp(){
+  $('#main').innerHTML=`<div class="card"><h3 style="margin-top:0">How it works</h3><ol><li>Tap <b>Who are you?</b> and add your name once (it's remembered on this device).</li><li>Enter how many of each item you want.</li><li>Your <b>estimated cost</b> is at the bottom. Costs are deducted from your paycheque.</li><li>The <b>case tracker</b> on each item shows whether the whole group's total fills whole cases. If it's short, the organizer will sort it out.</li></ol></div>
+  <div class="card"><h3 style="margin-top:0">Patch notes</h3>${PATCH_NOTES.map(e=>pnHTML(e)).join('')}<div class="note">Version ${APP_VERSION}</div></div>`;
+}
+function pnHTML(e){return `<div class="pn ${e.v===APP_VERSION?'cur':''}"><b>v${e.v} · ${esc(e.title)}</b> <span class="note">${esc(e.date)}</span><ul>${e.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul></div>`}
+function checkWhatsNew(fresh){
+  let last=null;try{last=parseInt(localStorage.getItem('shranck_lastSeenVer'),10)}catch(e){}
+  const save=()=>{try{localStorage.setItem('shranck_lastSeenVer',String(APP_VERSION))}catch(e){}};
+  if(fresh){save();return}
+  let ents;
+  if(!Number.isFinite(last))ents=[PATCH_NOTES[0]];else if(last<APP_VERSION)ents=PATCH_NOTES.filter(e=>e.v>last);else return;
+  if(!ents.length)return;
+  save();openModal(`<h2>🆕 What's new</h2>${ents.map(pnHTML).join('')}<div class="row2" style="justify-content:flex-end"><button class="btn" id="wnOk">Got it</button></div>`,()=>{$('#wnOk').onclick=closeModal});
+}
+
+/* ---- admin gate ---- */
+async function hashPw(pw){
+  try{if(window.crypto&&crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('shranck:'+pw));return 's:'+Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}}catch(e){}
+  let h=5381;const s='shranck:'+pw;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return 'd:'+(h>>>0).toString(16);
+}
+async function verifyPw(pw){const h=latestHash();if(h.startsWith('d:')){return h===(await hashPw.call(null,pw).then(x=>x.startsWith('d:')?x:fallbackHash(pw)))}return h===await hashPw(pw)}
+function fallbackHash(pw){let h=5381;const s='shranck:'+pw;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return 'd:'+(h>>>0).toString(16)}
+function unlock(){ADM=true;try{sessionStorage.setItem('shranck_admin','1')}catch(e){}TAB='admin';renderAll()}
+$('#admBtn').onclick=()=>{
+  if(ADM){ADM=false;try{sessionStorage.removeItem('shranck_admin')}catch(e){}TAB='order';renderAll();return}
+  if(!READY)return;
+  const first=!latestHash(); // newest data incl. any held-back snapshot, not possibly-stale S
+  openModal(`<h2>${first?'Set admin PIN':'Admin'}</h2><div class="field"><label>${first?'Choose a PIN (4+ characters)':'PIN'}</label><input id="pw" type="password" autocomplete="off"></div>${first?`<div class="field"><label>Confirm PIN</label><input id="pw2" type="password" autocomplete="off"></div>`:''}<div id="pwErr" class="note" style="color:var(--err)"></div><div class="row2" style="justify-content:flex-end"><button class="btn ghost" id="pwX">Cancel</button><button class="btn" id="pwOk">${first?'Set PIN':'Unlock'}</button></div>`,()=>{
+    const err=m=>$('#pwErr').textContent=m;
+    const go=async()=>{const pw=$('#pw').value;
+      if(first){if(pw.length<4)return err('At least 4 characters.');if(pw!==$('#pw2').value)return err('PINs do not match.');
+        const exists='An admin PIN already exists. Cancel and unlock with that PIN.';
+        if(latestHash())return err(exists);
+        const h=await hashPw(pw),ok_=$('#pwOk');
+        if(window.__fbSetIfEmpty){ // atomic: only succeeds if the DB has no PIN yet
+          ok_.disabled=true;let ok=false;
+          try{ok=await window.__fbSetIfEmpty('adminHash',h)}catch(e){ok_.disabled=false;return err('Could not save the PIN (offline?). Try again.')}
+          if(!ok){ok_.disabled=false;return err(exists)}
+        }else PENDING_PIN=h; // local-only mode: claimed atomically once Firebase connects
+        S.adminHash=h;saveLocal();closeModal();unlock()}
+      else{if(await verifyPw(pw)){closeModal();unlock()}else err('Wrong PIN.')}};
+    $('#pwOk').onclick=go;$('#pwX').onclick=closeModal;$('#pw').onkeydown=e=>{if(e.key==='Enter')go()};setTimeout(()=>$('#pw').focus(),50)});
+};
+
+/* ---- admin ---- */
+function renderAdmin(){
+  if(!ADM_RID||!S.rounds[ADM_RID])ADM_RID=S.currentRoundId;
+  const R=admRound();
+  const tabs=[['grid','Orders'],['setup','Round setup'],['names','Names'],['rounds','Rounds & export']];
+  let h=`<div class="row2" style="margin:8px 0"><label class="note">Round</label><select id="admRound">${Object.values(S.rounds).sort((a,b)=>b.createdAt-a.createdAt).map(r=>`<option value="${esc(r.id)}"${r.id===ADM_RID?'selected':''}>${esc(r.title)}${r.id===S.currentRoundId?' (current)':''}${r.status==='locked'?' 🔒':''}</option>`).join('')}</select></div>
+  <div class="sub">${tabs.map(t=>`<button data-at="${t[0]}" class="${ADM_TAB===t[0]?'on':''}">${t[1]}</button>`).join('')}</div><div id="admBody"></div>`;
+  $('#main').innerHTML=h;
+  $('#admRound').onchange=e=>{ADM_RID=e.target.value;renderAdmin()};
+  document.querySelectorAll('[data-at]').forEach(b=>b.onclick=()=>{ADM_TAB=b.dataset.at;renderAdmin()});
+  ({grid:adminGrid,setup:adminSetup,names:adminNames,rounds:adminRounds})[ADM_TAB]($('#admBody'),R);
+}
+function peopleSorted(){return Object.values(S.people).sort((a,b)=>(a.added-b.added)||a.name.localeCompare(b.name))}
+function adminGrid(el,R){
+  const ppl=peopleSorted();
+  if(!ppl.length){el.innerHTML='<div class="card empty">No one has added their name yet.</div>';return}
+  let h='';
+  R.blocks.forEach(b=>{
+    h+=`<h3>${esc(b.title)}</h3><div class="tw"><table class="g"><thead><tr><th>Person</th>${b.items.map(i=>`<th>${esc(i.name)}<div class="note">${esc(i.unit)}</div></th>`).join('')}<th>Est. cost</th></tr></thead><tbody>`;
+    ppl.forEach(p=>{
+      const c=personCost(R,p.id);
+      h+=`<tr><td>${esc(p.name)}</td>${b.items.map(i=>`<td><input type="number" min="0" step="${esc(i.step)}" value="${esc(num(R.orders[p.id]&&R.orders[p.id][i.id])||'')}" data-gq="${esc(p.id+'|'+i.id)}"></td>`).join('')}<td>${money(b.items.reduce((s,i)=>s+personCost({blocks:[{items:[i]}],orders:R.orders},p.id).total,0))}</td></tr>`;
+    });
+    const tots=b.items.map(i=>itemTotals(R,i.id));
+    h+=`<tr class="foot"><td>Total</td>${tots.map(t=>`<td>${t.total}</td>`).join('')}<td>${money(ppl.reduce((s,p)=>s+b.items.reduce((s2,i)=>s2+personCost({blocks:[{items:[i]}],orders:R.orders},p.id).total,0),0))}</td></tr>
+    <tr class="foot"><td>Per case</td>${b.items.map(i=>`<td>${i.incPerCase}</td>`).join('')}<td></td></tr>
+    <tr class="foot"><td>Cases</td>${tots.map(t=>`<td>${t.cases}</td>`).join('')}<td></td></tr>
+    <tr class="foot"><td>Variance</td>${tots.map((t,k)=>t.total===0?'<td>–</td>':t.aligned?'<td class="good">✓ 0</td>':`<td class="bad"><button class="btn sm" data-gap="${esc(b.items[k].id)}">${t.short} short · resolve</button></td>`).join('')}<td></td></tr></tbody></table></div>`;
+  });
+  el.innerHTML=h;
+  el.querySelectorAll('[data-gq]').forEach(i=>i.onchange=()=>{const[p,it]=i.dataset.gq.split('|'),item=findItem(R,it);if(!item)return;setQty(S,R.id,p,it,snapQty(i.value,item.step));persist([`rounds/${R.id}/orders/${p}/${it}`]);rerenderKeepFocus()});
+  el.querySelectorAll('[data-gap]').forEach(b=>b.onclick=()=>openGap(R.id,b.dataset.gap));
+}
+function openGap(rid,itemId){
+  const R=S.rounds[rid],it=findItem(R,itemId);if(!it)return;
+  const draw=()=>{
+    const t=itemTotals(R,itemId),ppl=peopleSorted();
+    const up=t.aligned?0:t.short,down=t.over;
+    $('#modal').innerHTML=`<h2>${esc(it.name)}</h2>
+    <div class="case ${t.aligned?'ok':'warn'}" style="margin:0 0 10px">${t.aligned?`✓ Lines up: ${t.total} ${esc(it.unit)}${t.total===1?'':'s'} = ${t.fullCases} case${t.fullCases===1?'':'s'}`:`Total ${t.total} · ${it.incPerCase} per case. Add <b>${up}</b> to reach ${t.fullCases+1} cases${t.fullCases>0?`, or remove <b>${down}</b> to drop to ${t.fullCases}`:''}.`}</div>
+    <div class="note">Adjust anyone's quantity below. Changes apply to costs immediately.</div>
+    <div style="max-height:46vh;overflow:auto;margin-top:8px">${ppl.map(p=>`<div class="row2" style="justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)"><span>${esc(p.name)}</span><span class="stepper"><button data-gd="${esc(p.id)}">−</button><input type="number" min="0" step="${esc(it.step)}" value="${esc(num(R.orders[p.id]&&R.orders[p.id][itemId])||'')}" placeholder="0" data-gi="${esc(p.id)}"><button data-gu="${esc(p.id)}">+</button></span></div>`).join('')}</div>
+    <div class="row2" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="gDone">Done</button></div>`;
+    const set=(pid,q)=>{setQty(S,rid,pid,itemId,snapQty(q,it.step));persist([`rounds/${rid}/orders/${pid}/${itemId}`]);draw()};
+    $('#modal').querySelectorAll('[data-gd]').forEach(b=>b.onclick=()=>set(b.dataset.gd,Math.max(0,num(R.orders[b.dataset.gd]&&R.orders[b.dataset.gd][itemId])-it.step)));
+    $('#modal').querySelectorAll('[data-gu]').forEach(b=>b.onclick=()=>set(b.dataset.gu,num(R.orders[b.dataset.gu]&&R.orders[b.dataset.gu][itemId])+it.step));
+    $('#modal').querySelectorAll('[data-gi]').forEach(i=>i.onchange=()=>set(i.dataset.gi,i.value));
+    $('#gDone').onclick=closeModal;
+  };
+  openModal('',draw);onModalClose=renderAll; // grid behind must reflect edits however the modal is closed
+}
+// remove item quantities; returns only the touched leaf paths (never a whole per-person map, so others' concurrent edits survive)
+function dropItems(R,itemIds){const paths=[];Object.keys(R.orders).forEach(p=>{const o=R.orders[p];if(!o)return;itemIds.forEach(id=>{if(id in o){delete o[id];paths.push(`rounds/${R.id}/orders/${p}/${id}`)}});if(!Object.keys(o).length)delete R.orders[p]});return paths}
+function adminSetup(el,R){
+  const wr=()=>{persist([`rounds/${R.id}/blocks`])};
+  const blockHtml=(b,bi)=>`<div class="card" data-b="${bi}"><div class="row2" style="justify-content:space-between"><b>Category ${bi+1}</b><button class="btn danger sm" data-delb="${bi}">Remove category</button></div>
+  <div class="row2"><div class="field" style="flex:1;min-width:160px"><label>Title</label><input data-bf="${bi}|title" value="${esc(b.title)}"></div><div class="field" style="flex:1;min-width:160px"><label>Delivery date</label><input data-bf="${bi}|delivery" value="${esc(b.delivery)}" placeholder="e.g. Thursday Nov 19th"></div><div class="field" style="flex:1;min-width:160px"><label>Order deadline</label><input data-bf="${bi}|deadline" value="${esc(b.deadline)}" placeholder="e.g. Friday Nov 13th"></div></div>
+  <div class="field"><label>Note shown to everyone</label><input data-bf="${bi}|note" value="${esc(b.note)}"></div>
+  ${b.items.map((i,ii)=>`<div class="itemrow">${[['name','Item'],['uom','UoM / description'],['coo','COO'],['unit','Order unit'],['costPerLb','Cost / lb'],['lbsPerUnit','Lbs per unit'],['incPerCase','Units per case']].map(([k,l])=>`<div class="field"><label>${l}</label><input data-if="${bi}|${ii}|${k}" value="${esc(i[k]==null?'':i[k])}" ${['costPerLb','lbsPerUnit','incPerCase'].includes(k)?'inputmode="decimal"':''}></div>`).join('')}<div class="row2"><label class="note"><input type="checkbox" data-if="${bi}|${ii}|half" ${i.step<1?'checked':''}> halves</label><button class="btn danger sm" data-deli="${bi}|${ii}">✕</button></div></div>`).join('')}
+  <button class="btn tonal sm" data-addi="${bi}">+ Add item</button></div>`;
+  el.innerHTML=`<div class="note">Round: <b>${esc(R.title)}</b>. Changes save as you edit and show on the order form immediately.</div>${R.blocks.map(blockHtml).join('')}<button class="btn tonal" id="addB">+ Add category</button>`;
+  el.addEventListener('change',e=>{
+    const bf=e.target.dataset.bf,f=e.target.dataset.if;
+    if(bf){const[bi,k]=bf.split('|');R.blocks[bi][k]=e.target.value;wr()}
+    else if(f){const[bi,ii,k]=f.split('|');const it=R.blocks[bi].items[ii];
+      if(k==='half')it.step=e.target.checked?0.5:1;
+      else if(k==='costPerLb'){const v=parseFloat(e.target.value);it.costPerLb=Number.isFinite(v)&&v>=0?v:null}
+      else if(k==='lbsPerUnit'||k==='incPerCase'){const v=parseFloat(e.target.value);it[k]=Number.isFinite(v)&&v>0?v:1}
+      else it[k]=e.target.value;
+      wr()}
+  });
+  el.querySelectorAll('[data-addi]').forEach(b=>b.onclick=()=>{R.blocks[b.dataset.addi].items.push(mkItem({name:'New item'}));wr();renderAdmin()});
+  el.querySelectorAll('[data-deli]').forEach(b=>b.onclick=()=>{const[bi,ii]=b.dataset.deli.split('|');const it=R.blocks[bi].items[ii];confirmBox(`Remove "${it.name}"? Its quantities in this round will be dropped.`,'Remove',()=>{R.blocks[bi].items.splice(ii,1);persist([`rounds/${R.id}/blocks`,...dropItems(R,[it.id])]);renderAdmin()},true)});
+  el.querySelectorAll('[data-delb]').forEach(b=>b.onclick=()=>{const bi=b.dataset.delb;confirmBox(`Remove category "${R.blocks[bi].title}" and all its items?`,'Remove',()=>{const gone=R.blocks[bi].items.map(it=>it.id);R.blocks.splice(bi,1);persist([`rounds/${R.id}/blocks`,...dropItems(R,gone)]);renderAdmin()},true)});
+  $('#addB').onclick=()=>{R.blocks.push({id:uid('b'),title:'New Order',delivery:'',deadline:'',note:'',items:[mkItem({name:'New item'})]});wr();renderAdmin()};
+}
+// per-path writes (not a whole-tree set) so concurrent edits by others are never clobbered
+function personPaths(ids){const out=[];ids.forEach(id=>{out.push('people/'+id);Object.keys(S.rounds).forEach(r=>out.push(`rounds/${r}/orders/${id}`))});return out}
+function adminNames(el){
+  const ppl=peopleSorted();
+  el.innerHTML=ppl.length?`<div class="card">${ppl.map(p=>`<div class="row2" style="justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)"><b>${esc(p.name)}</b><span class="row2"><button class="btn tonal sm" data-ren="${esc(p.id)}">Rename</button><button class="btn tonal sm" data-mrg="${esc(p.id)}">Merge into…</button><button class="btn danger sm" data-delp="${esc(p.id)}">Delete</button></span></div>`).join('')}</div>`:'<div class="card empty">No names yet. They appear when people open the app and add themselves.</div>';
+  el.querySelectorAll('[data-ren]').forEach(b=>b.onclick=()=>{const p=S.people[b.dataset.ren];openModal(`<h2>Rename</h2><div class="field"><input id="rn" value="${esc(p.name)}" maxlength="40"></div><div id="rnE" class="note" style="color:var(--err)"></div><div class="row2" style="justify-content:flex-end"><button class="btn ghost" id="rnX">Cancel</button><button class="btn" id="rnOk">Save</button></div>`,()=>{$('#rnX').onclick=closeModal;$('#rnOk').onclick=()=>{const v=$('#rn').value.trim();if(!v)return;const ex=findPersonByName(S,v);if(ex&&ex!==p.id){$('#rnE').textContent='That name already exists — use Merge instead.';return}p.name=v;persist(['people/'+p.id]);closeModal();renderAll()}})});
+  el.querySelectorAll('[data-mrg]').forEach(b=>b.onclick=()=>{const p=S.people[b.dataset.mrg];openModal(`<h2>Merge "${esc(p.name)}" into…</h2><div class="note">Their quantities are added to the person you pick, then this name is removed.</div><div class="chips">${ppl.filter(x=>x.id!==p.id).map(x=>`<button class="chip" data-to="${esc(x.id)}">${esc(x.name)}</button>`).join('')||'<span class="note">No one else.</span>'}</div><div class="row2" style="justify-content:flex-end"><button class="btn ghost" id="mX">Cancel</button></div>`,()=>{$('#mX').onclick=closeModal;$('#modal').querySelectorAll('[data-to]').forEach(c=>c.onclick=()=>{const to=c.dataset.to;
+        // target gets only the merged leaves written (not its whole order map); the merged-away person is removed entirely
+        const paths=personPaths([p.id]);Object.keys(S.rounds).forEach(r=>{const o=S.rounds[r].orders[p.id];if(o)Object.keys(o).forEach(iid=>paths.push(`rounds/${r}/orders/${to}/${iid}`))});
+        mergePeople(S,p.id,to);persist(paths);closeModal();validateMe();renderAll()})})});
+  el.querySelectorAll('[data-delp]').forEach(b=>b.onclick=()=>{const p=S.people[b.dataset.delp];confirmBox(`Delete "${p.name}" and all of their orders in every round?`,'Delete',()=>{deletePerson(S,p.id);persist(personPaths([p.id]));validateMe();renderAll()},true)});
+}
+function unresolved(R){const out=[];R.blocks.forEach(b=>b.items.forEach(i=>{const t=itemTotals(R,i.id);if(t.total&&!t.aligned)out.push(`${i.name}: ${t.short} short of ${t.fullCases+1} cases`)}));return out}
+function adminRounds(el,R){
+  el.innerHTML=`<div class="card"><div class="row2" style="justify-content:space-between"><div><b>${esc(R.title)}</b> ${R.id===S.currentRoundId?'<span class="pill on">current</span>':''} ${R.status==='locked'?'<span class="pill err">locked</span>':'<span class="pill">open</span>'}</div></div>
+  <div class="row2" style="margin-top:10px"><button class="btn" id="exp">⬇ Export to Excel</button><button class="btn tonal" id="lockB">${R.status==='locked'?'Unlock ordering':'Lock ordering'}</button>${R.id!==S.currentRoundId?'<button class="btn tonal" id="mkCur">Make current</button>':''}<button class="btn ghost" id="renR">Rename round</button></div></div>
+  <div class="card"><b>Start a new round</b><div class="note">Copies categories and items (with prices) but no orders or dates. Everyone's saved names stay.</div><div class="row2" style="margin-top:8px"><input id="nrT" placeholder="e.g. Dec 2026" style="flex:1"><button class="btn" id="nrB">Create</button></div></div>`;
+  $('#exp').onclick=()=>exportRoundXlsx(R.id).catch(e=>{console.error(e);toast('Export failed: '+e.message)});
+  $('#lockB').onclick=()=>{
+    if(R.status==='locked'){R.status='open';persist([`rounds/${R.id}/status`]);renderAll();return}
+    const u=unresolved(R),go=()=>{R.status='locked';persist([`rounds/${R.id}/status`]);renderAll()};
+    if(u.length)confirmBox('These items do not line up to full cases:\n\n'+u.join('\n')+'\n\nLock anyway?','Lock anyway',go,true);else go();
+  };
+  const mk=$('#mkCur');if(mk)mk.onclick=()=>{S.currentRoundId=R.id;persist(['currentRoundId']);renderAll()};
+  $('#renR').onclick=()=>openModal(`<h2>Rename round</h2><div class="field"><input id="rrT" value="${esc(R.title)}"></div><div class="row2" style="justify-content:flex-end"><button class="btn ghost" id="rrX">Cancel</button><button class="btn" id="rrOk">Save</button></div>`,()=>{$('#rrX').onclick=closeModal;$('#rrOk').onclick=()=>{const v=$('#rrT').value.trim();if(v){R.title=v;persist([`rounds/${R.id}/title`])}closeModal();renderAll()}});
+  $('#nrB').onclick=()=>{
+    const t=$('#nrT').value.trim();if(!t){toast('Enter a round name');return}
+    const id=uid('r'),n={id,title:t,status:'open',createdAt:Date.now(),orders:{},blocks:R.blocks.map(b=>({id:uid('b'),title:b.title,delivery:'',deadline:'',note:b.note,items:b.items.map(i=>Object.assign({},i,{id:uid('i')}))}))};
+    S.rounds[id]=n;S.currentRoundId=id;ADM_RID=id;persist([`rounds/${id}`,'currentRoundId']);ADM_TAB='setup';renderAll();toast('New round created — set dates and prices');
+  };
+}
+
+/* ---- Excel export ---- */
+function loadExcelJS(){
+  if(window.ExcelJS)return Promise.resolve();
+  return new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';s.onload=res;s.onerror=()=>rej(new Error('could not load Excel library (offline?)'));document.head.appendChild(s)});
+}
+function colL(n){let s='';while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s}
+async function exportRoundXlsx(rid){
+  await loadExcelJS();
+  const R=S.rounds[rid],ppl=peopleSorted();
+  const wb=new ExcelJS.Workbook(),ws=wb.addWorksheet((R.title.replace(/[\\\/?*\[\]:]/g,'')||'Order').slice(0,31),{views:[{showGridLines:true}]});
+  const bold={bold:true},fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE6F2F1'}};
+  const thin={style:'thin',color:{argb:'FFBEC9C8'}},box={top:thin,left:thin,bottom:thin,right:thin};
+  ws.getColumn(1).width=3;ws.getColumn(2).width=22;
+  let r=2;
+  R.blocks.forEach((b,bi)=>{
+    const n=b.items.length,first=3,last=first+n-1,costCol=Math.max(10,last+2);
+    for(let c=first;c<=costCol;c++)if(!ws.getColumn(c).width||ws.getColumn(c).width<18)ws.getColumn(c).width=c===costCol?18:20;
+    ws.getCell(r,2).value=b.title.toUpperCase();ws.getCell(r,2).font={bold:true,size:14};
+    const dates=[b.deadline?`ORDER DEADLINE: ${b.deadline.toUpperCase()}`:'',`DELIVERY DATE: ${(b.delivery||'TBD').toUpperCase()}`].filter(Boolean).join('   ');
+    ws.getCell(r,6).value=dates;ws.getCell(r,6).font={bold:true,color:{argb:'FFBA1A1A'}};
+    const hasCoo=b.items.some(i=>i.coo);
+    const itemRow=r+2,uomRow=itemRow+1;let row=uomRow+1;const cooRow=hasCoo?row++:0,priceRow=row++,lbsRow=row++;
+    ws.getCell(itemRow,2).value='Item';ws.getCell(uomRow,2).value='UoM';if(cooRow)ws.getCell(cooRow,2).value='COO';ws.getCell(priceRow,2).value='Cost per Lb';ws.getCell(lbsRow,2).value='Lbs per Piece';
+    if(b.note)ws.getCell(itemRow,costCol).value=b.note;
+    ws.getCell(lbsRow,costCol).value='Est. Cost/Person';ws.getCell(lbsRow,costCol).font=bold;
+    b.items.forEach((i,k)=>{const c=first+k;
+      ws.getCell(itemRow,c).value=i.name;ws.getCell(uomRow,c).value=i.uom;if(cooRow)ws.getCell(cooRow,c).value=i.coo;
+      if(i.costPerLb!=null){ws.getCell(priceRow,c).value=i.costPerLb;ws.getCell(priceRow,c).numFmt='$#,##0.00'}
+      ws.getCell(lbsRow,c).value=i.lbsPerUnit;
+      [itemRow,uomRow,cooRow,priceRow,lbsRow].filter(Boolean).forEach(rr=>{const cell=ws.getCell(rr,c);cell.alignment={wrapText:true,vertical:'top',horizontal:'center'}});
+      ws.getCell(itemRow,c).font=bold;
+    });
+    for(let rr=itemRow;rr<=lbsRow;rr++){for(let c=2;c<=Math.max(last,costCol);c++){const cell=ws.getCell(rr,c);cell.fill=fill;cell.border=box}ws.getCell(rr,2).font=bold}
+    const p0=lbsRow+1;let pr=p0;
+    ppl.forEach(p=>{
+      ws.getCell(pr,2).value=p.name;ws.getCell(pr,2).border=box;
+      b.items.forEach((i,k)=>{const q=num(R.orders[p.id]&&R.orders[p.id][i.id]);const cell=ws.getCell(pr,first+k);if(q)cell.value=q;cell.border=box;cell.alignment={horizontal:'center'}});
+      const L=colL(first),La=colL(last);
+      const cc=ws.getCell(pr,costCol);cc.value={formula:`SUMPRODUCT(${L}${pr}:${La}${pr},$${L}$${priceRow}:$${La}$${priceRow},$${L}$${lbsRow}:$${La}$${lbsRow})`};cc.numFmt='$#,##0.00';cc.border=box;
+      pr++;
+    });
+    const p1=Math.max(pr-1,p0),tI=pr,incR=pr+1,tC=pr+2;
+    ws.getCell(tI,2).value='Total Increments';ws.getCell(incR,2).value='Increments/Case';ws.getCell(tC,2).value='Total Cases';
+    b.items.forEach((i,k)=>{const c=first+k,L=colL(c);
+      ws.getCell(tI,c).value={formula:ppl.length?`SUM(${L}${p0}:${L}${p1})`:'0'};
+      ws.getCell(incR,c).value=i.incPerCase;
+      ws.getCell(tC,c).value={formula:`${L}${tI}/${L}${incR}`};ws.getCell(tC,c).numFmt='0.00';
+    });
+    ws.getCell(tI,costCol).value={formula:ppl.length?`SUM(${colL(costCol)}${p0}:${colL(costCol)}${p1})`:'0'};ws.getCell(tI,costCol).numFmt='$#,##0.00';
+    [tI,incR,tC].forEach(rr=>{for(let c=2;c<=Math.max(last,costCol);c++){const cell=ws.getCell(rr,c);cell.fill=fill;cell.border=box;if(c>2&&c<=last)cell.alignment={horizontal:'center'}}ws.getCell(rr,2).font=bold});
+    r=tC+2;
+  });
+  const buf=await wb.xlsx.writeBuffer();
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  a.download=(R.title.replace(/[^\w\- ]+/g,'')||'Order')+' - Food Orders.xlsx';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
+  toast('Exported');
+}
+
+/* ---- boot ---- */
+function boot(){
+  let fresh=true,raw=null;
+  try{raw=localStorage.getItem('shranck_data');if(raw)fresh=false}catch(e){}
+  try{S=normalize(raw?JSON.parse(raw):null)}catch(e){S=normalize(null)}
+  try{ME=localStorage.getItem('shranck_me')}catch(e){}
+  try{const q=JSON.parse(localStorage.getItem('shranck_queue')||'[]');if(Array.isArray(q))q.forEach(p=>{if(typeof p==='string')QUEUE.add(p)})}catch(e){}
+  try{ADM=sessionStorage.getItem('shranck_admin')==='1'&&!!S.adminHash}catch(e){}
+  validateMe();applyThemeBtn();renderAll();
+  if(fresh)checkWhatsNew(true);
+  else if(me())checkWhatsNew(false); // the name picker opens from markReady() once data has loaded
+  if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+boot();
+</script>
+
+<script type="module" id="fbmod">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getDatabase, ref, child, onValue, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyD9AJbPC9M4gpTyvfIoRcqILq0ZOom1OBs",
+  authDomain: "bon-echo-bd946.firebaseapp.com",
+  databaseURL: "https://bon-echo-bd946-default-rtdb.firebaseio.com",
+  projectId: "bon-echo-bd946",
+  storageBucket: "bon-echo-bd946.firebasestorage.app",
+  messagingSenderId: "196437731482",
+  appId: "1:196437731482:web:3ac836962ce7d89e735723"
+};
+try{
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const node = ref(db, 'shranck/main');
+  window.__fbSet = obj => { set(node, obj).catch(e=>console.warn('fb set',e)); };
+  window.__fbUpdate = u => { update(node, u).catch(e=>console.warn('fb update',e)); };
+  // atomic write that only succeeds while the path is empty; resolves true if this client wrote it
+  window.__fbSetIfEmpty = (path, value) => runTransaction(child(node, path), cur => (cur == null || cur === '') ? value : undefined).then(r => r.committed);
+  // seed an empty node exactly once across all clients (abort if anyone else already has data there)
+  window.__fbSeed = seed => { runTransaction(node, cur => cur === null ? seed : undefined).catch(e=>console.warn('fb seed',e)); };
+  onValue(node, snap => {
+    if(window.__setSync) window.__setSync('on');
+    if(window.__applyRemote) window.__applyRemote(snap.val());
+  }, err => { console.warn('fb sync error', err); if(window.__setSync) window.__setSync('err'); });
+}catch(e){ console.warn('Firebase init failed — local only', e); if(window.__setSync) window.__setSync('err'); }
+</script>
+</body>
+</html>
