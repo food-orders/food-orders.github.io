@@ -238,9 +238,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=2; // build number (= sw.js cache shranck-shell-vN); users see the label
-const APP_LABEL='1.1';
-const PATCH_NOTES=[{v:2,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const APP_VERSION=3; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_LABEL='1.1.1';
+const PATCH_NOTES=[{v:3,label:'1.1.1',date:'2026-11-10',title:'Tab title',notes:['Browser tab title is back to "Shranck App"']},{v:2,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
