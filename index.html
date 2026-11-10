@@ -21,9 +21,15 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);outline
 header{position:sticky;top:0;z-index:20;background:var(--surf);border-bottom:1px solid var(--line);box-shadow:0 1px 6px rgba(0,0,0,.06)}
 header .hin{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:16px 16px;flex-wrap:wrap}
 header h1{font-size:25px;margin:0 8px 0 0;font-weight:700;letter-spacing:-.2px;flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:10px}
-header h1 .logo{width:52px;height:52px;border-radius:14px;flex-shrink:0;display:block}
+header h1 .logo{width:72px;height:72px;border-radius:18px;flex-shrink:0;display:block;cursor:zoom-in;transition:transform .15s}
+.logo:hover{transform:scale(1.06) rotate(-3deg)}
+.logo:active{transform:scale(.96)}
+.logobig{display:block;width:min(320px,100%);aspect-ratio:1;margin:4px auto 0;border-radius:18%;box-shadow:0 8px 28px rgba(0,0,0,.28)}
+.helpsplash{display:flex;flex-direction:column;align-items:center;text-align:center;margin:6px 0 18px}
+.helpsplash img{width:min(220px,60vw);aspect-ratio:1;border-radius:18%;box-shadow:0 8px 28px rgba(0,0,0,.25);cursor:zoom-in}
+.helpsplash b{font-size:22px;margin-top:12px}
 header h1 span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-@media(max-width:420px){header h1{font-size:19px;gap:8px}header h1 .logo{width:40px;height:40px;border-radius:11px}header .ibtn{width:42px;height:42px;font-size:18px}#meBtn{line-height:42px}}
+@media(max-width:420px){header h1{font-size:19px;gap:8px}header h1 .logo{width:56px;height:56px;border-radius:14px}header .ibtn{width:42px;height:42px;font-size:18px}#meBtn{line-height:42px}}
 .hist td{text-align:left!important;white-space:normal!important}.hist td.n{white-space:nowrap!important}
 .prio{margin:0;padding-left:22px}.prio li{padding:3px 0}
 header .pill,header .ibtn{flex-shrink:0}
@@ -109,11 +115,12 @@ td.bad{}td.good{color:var(--ok)}
 h3{margin:18px 0 6px}
 .empty{padding:30px;text-align:center;color:var(--on2)}
 #doneBtn{white-space:nowrap}
+@media(max-width:420px){header .hin h1{flex:0 0 auto}header .hin h1>span{display:none}header .hin h1 .logo{width:52px;height:52px;border-radius:13px}header .hin .ibtn{width:44px;height:44px;font-size:19px}header .hin #sync{max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}header .hin #meBtn{max-width:calc(100vw - 296px);line-height:44px}}
 </style>
 </head>
 <body>
 <header><div class="hin">
-  <h1><img class="logo" src="logo.png" alt=""><span>Schrank App</span></h1>
+  <h1><img class="logo" id="logoBtn" src="logo-512.jpg" alt="Schrank App logo — tap to enlarge" role="button" tabindex="0"><span>Schrank App</span></h1>
   <nav class="tabs" id="tabs"></nav>
   <span id="sync" class="pill">Connecting…</span>
   <button class="ibtn" id="meBtn" title="Who am I" style="width:auto;border-radius:99px;padding:0 14px;font-size:14px;font-weight:600"></button>
@@ -258,9 +265,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=14; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_VERSION=15; // build number (= sw.js cache shranck-shell-vN); users see the label
 const APP_LABEL='1.3';
-const PATCH_NOTES=[{v:14,label:'1.3',date:'2026-11-10',title:'Table view + locking',notes:['App name is now Schrank App',"Tap “🔒 I'm done” at the bottom to lock your order; tap Unlock to change it, until the admin locks everyone",'Admin: “Lock everyone” button at the top, and a 🔒 next to people who are done','Order page: switch between Cards and a compact Table view (top right)','Table shows price, per-unit cost, your order, your cost and case status in one row per item','Your choice is remembered on this device']},{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Schrank App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const PATCH_NOTES=[{v:15,label:'1.3',date:'2026-11-10',title:'Table view + locking',notes:['Bigger logo — tap it to see it full size','App name is now Schrank App',"Tap “🔒 I'm done” at the bottom to lock your order; tap Unlock to change it, until the admin locks everyone",'Admin: “Lock everyone” button at the top, and a 🔒 next to people who are done','Order page: switch between Cards and a compact Table view (top right)','Table shows price, per-unit cost, your order, your cost and case status in one row per item','Your choice is remembered on this device']},{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Schrank App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,ORDER_VIEW=(()=>{try{return localStorage.getItem('shranck_view')==='table'?'table':'cards'}catch(e){return 'cards'}})(),TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
@@ -338,6 +345,9 @@ function openNameModal(){
 
 /* ---- modal ---- */
 let onModalClose=null;
+function showLogo(){openModal(`<img class="logobig" src="logo-512.jpg" alt="Schrank App logo"><div class="row2" style="justify-content:center;margin-top:16px"><button class="btn" onclick="closeModal()">Close</button></div>`)}
+document.addEventListener('click',e=>{if(e.target.closest('#logoBtn,[data-logobig]'))showLogo()});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.id==='logoBtn'){e.preventDefault();showLogo()}});
 function openModal(html,mount){onModalClose=null;NAME_OPEN=false;$('#modal').innerHTML=html;$('#ov').classList.add('open');mount&&mount()}
 function closeModal(){const wasOpen=$('#ov').classList.contains('open');NAME_OPEN=false;$('#ov').classList.remove('open');$('#modal').innerHTML='';const f=onModalClose;onModalClose=null;if(wasOpen&&f)f();setTimeout(flushPending,60)}
 $('#ov').addEventListener('mousedown',e=>{if(e.target.id==='ov')closeModal()});
@@ -441,7 +451,7 @@ $('#main').addEventListener('click',e=>{
 $('#main').addEventListener('change',e=>{const i=e.target.closest('[data-qty]');if(i)changeQty(i.dataset.qty,i.value)});
 
 function renderHelp(){
-  $('#main').innerHTML=`<div class="card"><h3 style="margin-top:0">How it works</h3><ol><li>Tap <b>Who are you?</b> and add your name once (it's remembered on this device).</li><li>Enter how many of each item you want.</li><li>Your <b>estimated cost</b> is at the bottom. Costs are deducted from your paycheque.</li><li>The <b>case tracker</b> on each item shows whether the whole group's total fills whole cases. If it's short, the organizer will sort it out.</li></ol></div>
+  $('#main').innerHTML=`<div class="helpsplash"><img src="logo-512.jpg" alt="Schrank App logo" data-logobig><b>Schrank App</b><span class="note">Group food orders, minus the spreadsheet</span></div><div class="card"><h3 style="margin-top:0">How it works</h3><ol><li>Tap <b>Who are you?</b> and add your name once (it's remembered on this device).</li><li>Enter how many of each item you want.</li><li>Your <b>estimated cost</b> is at the bottom. Costs are deducted from your paycheque.</li><li>The <b>case tracker</b> on each item shows whether the whole group's total fills whole cases. If it's short, the organizer will sort it out.</li></ol></div>
   <div class="card"><h3 style="margin-top:0">Patch notes</h3>${PATCH_NOTES.map(e=>pnHTML(e)).join('')}<div class="note">Version ${APP_LABEL}</div></div>`;
 }
 function pnHTML(e){return `<div class="pn ${e.v===APP_VERSION?'cur':''}"><b>v${esc(e.label||e.v)} ·${esc(e.title)}</b> <span class="note">${esc(e.date)}</span><ul>${e.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul></div>`}
