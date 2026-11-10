@@ -84,6 +84,10 @@ button:not(:disabled):active{transform:scale(.92);box-shadow:none;transition-dur
 .chip{padding:8px 14px;border-radius:99px;background:var(--surf2);font-weight:600}
 .row2{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .sub{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}.sub button{padding:6px 14px;border-radius:99px;background:var(--surf2);font-weight:600}.sub button.on{background:var(--primary);color:var(--onprimary)}
+.viewtog{margin:4px 0 0;justify-content:flex-end}.viewtog+.blocktitle{margin-top:0}
+table.ot{table-layout:fixed;min-width:760px}table.ot th:nth-child(2){width:90px}table.ot th:nth-child(3){width:120px}table.ot th:nth-child(4){width:160px}table.ot th:nth-child(5){width:100px}table.ot th:nth-child(6){width:150px}table.ot td{vertical-align:middle;white-space:nowrap}table.ot td:first-child{white-space:normal}table.ot .i-name{font-size:15px}table.ot .i-sub{margin:2px 0 0}table.ot .stepper{gap:6px;justify-content:center}table.ot .stepper button{width:34px;height:34px}table.ot .stepper button.pm::before,table.ot .stepper button.pm.pl::after{width:12px}table.ot .stepper button.pm.pl::after{width:3px;height:12px}table.ot th{text-align:center}table.ot th:first-child{text-align:left}
+.mo{display:none}@media(max-width:760px){table.ot{min-width:0}table.ot th:nth-child(2),table.ot td:nth-child(2),table.ot th:nth-child(3),table.ot td:nth-child(3),table.ot th:nth-child(n+5),table.ot td:nth-child(n+5){display:none}table.ot th:nth-child(4){width:140px}table.ot td:first-child,table.ot th:first-child{position:static}.mo{display:block}.mcost{text-align:center;font-weight:700;margin-top:4px;font-size:14px}}
+.cpill{display:inline-block;padding:4px 10px;border-radius:99px;font-size:13px;background:var(--surf2);color:var(--on2)}.cpill.ok{background:var(--okc);color:var(--ok);font-weight:600}.cpill.warn{background:var(--warnc);color:var(--warn)}
 .tw{overflow:auto;border-radius:18px;border:1px solid var(--line);background:var(--surf)}
 table.g{border-collapse:collapse;width:100%;font-size:14px}
 table.g th,table.g td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
@@ -248,10 +252,10 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=10; // build number (= sw.js cache shranck-shell-vN); users see the label
-const APP_LABEL='1.2';
-const PATCH_NOTES=[{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['App name is now ShranCk App','Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays ShranCk App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
-let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,TAB='order',pending=null,viewBrk=false;
+const APP_VERSION=11; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_LABEL='1.3';
+const PATCH_NOTES=[{v:11,label:'1.3',date:'2026-11-10',title:'Table view',notes:['Order page: switch between Cards and a compact Table view (top right)','Table shows price, per-unit cost, your order, your cost and case status in one row per item','Your choice is remembered on this device']},{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['App name is now ShranCk App','Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays ShranCk App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,ORDER_VIEW=(()=>{try{return localStorage.getItem('shranck_view')==='table'?'table':'cards'}catch(e){return 'cards'}})(),TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
 const $=s=>document.querySelector(s);
@@ -368,16 +372,35 @@ function itemCard(R,b,it,editable){
   <div class="i-cost">${q?`Your cost: <b>${it.costPerLb==null?'TBD':money(q*unitCost)}</b>`:'&nbsp;'}</div>
   <div class="case ${ci.cls}">${ci.html}<div class="bar"><i style="width:${ci.pct}%"></i></div></div></div>`;
 }
+function caseShort(t,it){
+  if(!t.total)return {cls:'',txt:`${t.inc>1?t.inc:1} per case`};
+  if(t.aligned)return {cls:'ok',txt:`✓ ${t.fullCases} case${t.fullCases===1?'':'s'}`};
+  return {cls:'warn',txt:`${t.total} / ${(t.fullCases+1)*t.inc} · <b>${t.short} short</b>`};
+}
+function itemRow(R,it,editable){
+  const t=itemTotals(R,it.id),cs=caseShort(t,it),q=num(R.orders[me()]&&R.orders[me()][it.id]);
+  const unitCost=it.costPerLb==null?null:it.lbsPerUnit*it.costPerLb;
+  return `<tr><td><div class="i-name">${esc(it.name)}</div><div class="i-sub">${esc(it.uom)}${it.coo?' · '+esc(it.coo):''}</div><div class="mo i-sub">${it.costPerLb==null?'<span style="color:var(--warn)">price TBD</span>':money(it.costPerLb)+'/lb'}${unitCost!=null?' · '+money(unitCost)+' / '+esc(it.unit):''}</div><div class="mo" style="margin-top:6px"><span class="cpill ${cs.cls}">${cs.txt}</span></div></td>
+  <td>${it.costPerLb==null?'<span style="color:var(--warn)">TBD</span>':money(it.costPerLb)+'/lb'}</td>
+  <td>${unitCost!=null?money(unitCost)+' / '+esc(it.unit):'—'}</td>
+  <td><div class="stepper"><button data-dec="${esc(it.id)}" ${editable?'':'disabled'} aria-label="less" class="pm"></button><input type="number" inputmode="decimal" min="0" step="${esc(it.step)}" value="${esc(q||'')}" placeholder="0" data-qty="${esc(it.id)}" ${editable?'':'disabled'}><button data-inc="${esc(it.id)}" ${editable?'':'disabled'} aria-label="more" class="pm pl"></button></div>${q?`<div class="mo mcost">${it.costPerLb==null?'TBD':money(q*unitCost)}</div>`:''}</td>
+  <td>${q?`<b>${it.costPerLb==null?'TBD':money(q*unitCost)}</b>`:'<span class="note">—</span>'}</td>
+  <td><span class="cpill ${cs.cls}">${cs.txt}</span></td></tr>`;
+}
 function renderOrder(){
   const R=cur(),locked=R.status==='locked',m=me(),editable=!!m&&!locked&&READY;
   let h=locked?'<div class="note" style="margin-top:4px">🔒 Ordering is closed</div>':'';
+  h+=`<div class="sub viewtog" role="group" aria-label="View"><button data-view="cards" class="${ORDER_VIEW==='cards'?'on':''}">▦ Cards</button><button data-view="table" class="${ORDER_VIEW==='table'?'on':''}">☰ Table</button></div>`;
   if(!m)h+=`<div class="card"><b>Pick your name to start ordering.</b><div style="margin-top:10px"><button class="btn" id="nameStart" ${READY?'':'disabled'}>${READY?'Who are you?':'Connecting…'}</button></div></div>`;
   R.blocks.forEach(b=>{
     h+=`<div class="blocktitle">${esc(b.title)}</div><div class="banner"><div class="d">📅 <span>Delivery:</span> <b>${esc(b.delivery||'TBD')}</b></div>${b.deadline?`<div class="d">⏰ <span>Order by:</span> <b>${esc(b.deadline)}</b></div>`:''}${b.note?`<div class="note" style="flex-basis:100%">${esc(b.note)}</div>`:''}</div>`;
-    h+=`<div class="items">${b.items.map(it=>itemCard(R,b,it,editable)).join('')||'<div class="empty">No items yet.</div>'}</div>`;
+    if(!b.items.length)h+='<div class="empty">No items yet.</div>';
+    else if(ORDER_VIEW==='table')h+=`<div class="tw"><table class="g ot"><thead><tr><th>Item</th><th>Price</th><th>Per unit</th><th>Your order</th><th>Your cost</th><th>Cases</th></tr></thead><tbody>${b.items.map(it=>itemRow(R,it,editable)).join('')}</tbody></table></div>`;
+    else h+=`<div class="items">${b.items.map(it=>itemCard(R,b,it,editable)).join('')}</div>`;
   });
   $('#main').innerHTML=h;
   const ns=$('#nameStart');if(ns)ns.onclick=openNameModal;
+  document.querySelectorAll('[data-view]').forEach(x=>x.onclick=()=>{ORDER_VIEW=x.dataset.view;try{localStorage.setItem('shranck_view',ORDER_VIEW)}catch(e){}renderOrder()});
 }
 function renderCostBar(){
   const cb=$('#costbar');
