@@ -19,15 +19,16 @@ button{font:inherit;cursor:pointer;border:0;color:inherit}
 input,select,textarea{font:inherit;color:var(--on);background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);outline-offset:0;border-color:transparent}
 header{position:sticky;top:0;z-index:20;background:var(--surf);border-bottom:1px solid var(--line);box-shadow:0 1px 6px rgba(0,0,0,.06)}
-header .hin{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:12px 16px;flex-wrap:wrap}
-header h1{font-size:22px;margin:0 8px 0 0;font-weight:700;letter-spacing:-.2px;flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:10px}
-header h1 .logo{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:block}
+header .hin{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:16px 16px;flex-wrap:wrap}
+header h1{font-size:25px;margin:0 8px 0 0;font-weight:700;letter-spacing:-.2px;flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:10px}
+header h1 .logo{width:52px;height:52px;border-radius:14px;flex-shrink:0;display:block}
 header h1 span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-@media(max-width:420px){header h1{font-size:19px;gap:8px}header h1 .logo{width:34px;height:34px;border-radius:10px}}
+@media(max-width:420px){header h1{font-size:19px;gap:8px}header h1 .logo{width:40px;height:40px;border-radius:11px}header .ibtn{width:42px;height:42px;font-size:18px}#meBtn{line-height:42px}}
 .hist td{text-align:left!important;white-space:normal!important}.hist td.n{white-space:nowrap!important}
 .prio{margin:0;padding-left:22px}.prio li{padding:3px 0}
 header .pill,header .ibtn{flex-shrink:0}
-#meBtn{max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;line-height:40px}
+header .ibtn{width:48px;height:48px;font-size:21px}header .pill{font-size:13px;padding:6px 12px}header nav.tabs button{font-size:16px;padding:10px 18px}
+#meBtn{max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;line-height:48px;font-size:15px!important}
 @media(max-width:760px){header h1{flex:1}header nav.tabs{order:9;flex-basis:100%;padding:2px 0 0}}
 @media(max-width:420px){header .hin{gap:6px;padding:10px 12px}}
 .pill{font-size:12px;padding:4px 10px;border-radius:99px;background:var(--surf2);color:var(--on2)}
@@ -104,7 +105,7 @@ h3{margin:18px 0 6px}
 </head>
 <body>
 <header><div class="hin">
-  <h1><img class="logo" src="logo.png" alt=""><span>Shranck</span></h1>
+  <h1><img class="logo" src="logo.png" alt=""><span>Shranck App</span></h1>
   <nav class="tabs" id="tabs"></nav>
   <span id="sync" class="pill">Connecting…</span>
   <button class="ibtn" id="meBtn" title="Who am I" style="width:auto;border-radius:99px;padding:0 14px;font-size:14px;font-weight:600"></button>
@@ -247,9 +248,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=5; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_VERSION=6; // build number (= sw.js cache shranck-shell-vN); users see the label
 const APP_LABEL='1.2';
-const PATCH_NOTES=[{v:5,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are now evenly spaced with centered symbols','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: shortfalls no longer highlighted yellow','Cleaner layout: tabs now sit in the top bar, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Shranck App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const PATCH_NOTES=[{v:6,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are now evenly spaced with centered symbols','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Shranck App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
