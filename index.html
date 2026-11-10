@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shranck App</title>
+<title>Shranck</title>
 <meta name="theme-color" content="#006a6b">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="favicon.ico" sizes="any">
@@ -19,7 +19,12 @@ button{font:inherit;cursor:pointer;border:0;color:inherit}
 input,select,textarea{font:inherit;color:var(--on);background:var(--surf);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);outline-offset:0;border-color:transparent}
 header{position:sticky;top:0;z-index:20;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
-header h1{font-size:20px;margin:0;font-weight:700;letter-spacing:-.2px;flex:1;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+header h1{font-size:22px;margin:0;font-weight:700;letter-spacing:-.2px;flex:1;min-width:0;display:flex;align-items:center;gap:10px}
+header h1 .logo{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:block}
+header h1 span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+@media(max-width:420px){header h1{font-size:19px;gap:8px}header h1 .logo{width:34px;height:34px;border-radius:10px}}
+.hist td{text-align:left!important;white-space:normal!important}.hist td.n{white-space:nowrap!important}
+.prio{margin:0;padding-left:22px}.prio li{padding:3px 0}
 header .pill,header .ibtn{flex-shrink:0}
 #meBtn{max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;line-height:40px}
 @media(max-width:420px){header{gap:6px;padding:10px 12px}}
@@ -90,7 +95,7 @@ h3{margin:18px 0 6px}
 </head>
 <body>
 <header>
-  <h1>🛒 Shranck App</h1>
+  <h1><img class="logo" src="logo.png" alt=""><span>Shranck</span></h1>
   <span id="sync" class="pill">Connecting…</span>
   <button class="ibtn" id="meBtn" title="Who am I" style="width:auto;border-radius:99px;padding:0 14px;font-size:14px;font-weight:600"></button>
   <button class="ibtn" id="admBtn" title="Admin">🔓</button>
@@ -132,7 +137,35 @@ function normBlock(b){
 function normRound(r,id){
   r=r&&typeof r==='object'?r:{};
   const blocks=arr(r.blocks).map(normBlock).filter(b=>validId(b.id));
-  return {id:String(id),title:String(r.title||'Order round'),status:r.status==='locked'?'locked':'open',createdAt:Number(r.createdAt)||0,blocks,orders:r.orders&&typeof r.orders==='object'?r.orders:{}};
+  return {id:String(id),title:String(r.title||'Order round'),status:r.status==='locked'?'locked':'open',createdAt:Number(r.createdAt)||0,blocks,orders:r.orders&&typeof r.orders==='object'?r.orders:{},log:normLog(r.log)};
+}
+// order history: {t:first time, u:last touch, p:person, i:item, f:qty before, q:qty after, a:1 if admin made it, n/m: person/item name snapshots}
+function normLog(l){
+  const out={};if(!l||typeof l!=='object')return out;
+  Object.keys(l).forEach(k=>{const e=l[k];if(!validId(k)||!e||typeof e!=='object'||!validId(e.p)||!validId(e.i))return;
+    const t=Number(e.t);if(!Number.isFinite(t)||t<=0)return;const u=Number(e.u);
+    out[k]={t,p:e.p,i:e.i,f:num(e.f),q:num(e.q),a:e.a?1:0,n:String(e.n||'').slice(0,80),m:String(e.m||'').slice(0,160)};
+    if(Number.isFinite(u)&&u>=t)out[k].u=u});
+  return out;
+}
+// record a qty change; quick repeat edits by the same actor on the same person+item within 2 min fold into one entry
+// (an entry whose net change becomes zero is removed). Returns the touched log id, or null.
+const LOG_MERGE_MS=120000;
+function logChange(R,pid,itemId,from,to,byAdmin,pname,iname,now){
+  from=num(from);to=num(to);if(from===to)return null;if(!R.log)R.log={};
+  const a=byAdmin?1:0;let last=null,lastId=null;
+  Object.keys(R.log).forEach(k=>{const e=R.log[k];if(e.p===pid&&e.i===itemId&&(!last||e.t>=last.t)){last=e;lastId=k}});
+  if(last&&last.a===a&&now-(last.u||last.t)<LOG_MERGE_MS){last.q=to;last.u=now;if(last.q===last.f)delete R.log[lastId];return lastId}
+  const id=uid('h');R.log[id]={t:now,p:pid,i:itemId,f:from,q:to,a,n:String(pname||'').slice(0,80),m:String(iname||'').slice(0,160)};return id;
+}
+// who has this item, earliest first: "since" = when they last went from 0 to ordering it (their own entry preferred over an admin's)
+function orderPriority(R,itemId){
+  const log=R.log||{},out=[];
+  Object.keys(R.orders||{}).forEach(pid=>{const q=num(R.orders[pid]&&R.orders[pid][itemId]);if(!q)return;
+    let own=null,any=null;
+    Object.keys(log).forEach(k=>{const e=log[k];if(e.p!==pid||e.i!==itemId||e.f!==0||!(e.q>0))return;if(!e.a&&(own==null||e.t>own))own=e.t;if(any==null||e.t>any)any=e.t});
+    out.push({pid,qty:q,since:own!=null?own:any})});
+  return out.sort((x,y)=>((x.since==null)-(y.since==null))||((x.since||0)-(y.since||0))||x.pid.localeCompare(y.pid));
 }
 function normalize(raw){
   raw=raw&&typeof raw==='object'?raw:{};
@@ -168,7 +201,7 @@ function seedState(){
     m({id:'i_v1620',name:'Vannamei Shrimp PDTO (16/20)',uom:'5x2 lb Case',coo:'India',unit:'2 lb bag',costPerLb:8.95,lbsPerUnit:2,incPerCase:5}),
     m({id:'i_v2125',name:'Vannamei Shrimp PDTO (21/25)',uom:'5x2 lb Case',coo:'India',unit:'2 lb bag',costPerLb:8.25,lbsPerUnit:2,incPerCase:5}),
     m({id:'i_pick',name:'Wild Ontario Pickerel - individual Vac Pack - Order By Case',uom:'5-6 oz Pieces - 11lb Case',unit:'case',costPerLb:null,lbsPerUnit:11,incPerCase:1})]};
-  const r={id:'r_nov2026',title:'Nov 2026',status:'open',createdAt:1762732800000,blocks:[meat,sea],orders:{}};
+  const r={id:'r_nov2026',title:'Nov 2026',status:'open',createdAt:1762732800000,blocks:[meat,sea],orders:{},log:{}};
   return {app:'shranck',version:1,savedAt:0,adminHash:'',currentRoundId:r.id,people:{},rounds:{[r.id]:r}};
 }
 function findItem(round,itemId){for(const b of round.blocks)for(const i of b.items)if(i.id===itemId)return i;return null}
@@ -205,8 +238,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=1;
-const PATCH_NOTES=[{v:1,date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const APP_VERSION=2; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_LABEL='1.1';
+const PATCH_NOTES=[{v:2,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
@@ -344,9 +378,16 @@ function renderCostBar(){
 }
 function changeQty(itemId,q){
   const R=cur(),it=findItem(R,itemId);if(!me()||R.status==='locked'||!it||!READY)return;
-  // single leaf path: never push the whole (possibly stale) order map
-  setQty(S,R.id,me(),itemId,snapQty(q,it.step));persist([`rounds/${R.id}/orders/${me()}/${itemId}`]);rerenderKeepFocus();
+  persist(setQtyLogged(R,me(),it,q,false));rerenderKeepFocus();
 }
+// set a qty + record it in the round's history; returns the leaf paths to write (never the whole, possibly stale, order map)
+function setQtyLogged(R,pid,it,q,byAdmin){
+  const from=num(R.orders[pid]&&R.orders[pid][it.id]),to=snapQty(q,it.step);
+  setQty(S,R.id,pid,it.id,to);
+  const lid=logChange(R,pid,it.id,from,to,byAdmin,S.people[pid]?S.people[pid].name:'',it.name,Date.now());
+  return [`rounds/${R.id}/orders/${pid}/${it.id}`,...(lid?[`rounds/${R.id}/log/${lid}`]:[])];
+}
+const fmtT=t=>t?new Date(t).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'before history began';
 // re-render after focus settles, then put focus back on the same control (else Tab after typing a qty drops focus to <body>)
 function rerenderKeepFocus(){setTimeout(()=>{const a=document.activeElement;let sel=null;if(a&&a.dataset)for(const k of ['qty','inc','dec','gq']){if(a.dataset[k]!=null){sel=`[data-${k}="${CSS.escape(a.dataset[k])}"]`;break}}
   renderAll();if(sel){const n=document.querySelector(sel);if(n){n.focus();if(n.select)try{n.select()}catch(e){}}}},0)}
@@ -359,9 +400,9 @@ $('#main').addEventListener('change',e=>{const i=e.target.closest('[data-qty]');
 
 function renderHelp(){
   $('#main').innerHTML=`<div class="card"><h3 style="margin-top:0">How it works</h3><ol><li>Tap <b>Who are you?</b> and add your name once (it's remembered on this device).</li><li>Enter how many of each item you want.</li><li>Your <b>estimated cost</b> is at the bottom. Costs are deducted from your paycheque.</li><li>The <b>case tracker</b> on each item shows whether the whole group's total fills whole cases. If it's short, the organizer will sort it out.</li></ol></div>
-  <div class="card"><h3 style="margin-top:0">Patch notes</h3>${PATCH_NOTES.map(e=>pnHTML(e)).join('')}<div class="note">Version ${APP_VERSION}</div></div>`;
+  <div class="card"><h3 style="margin-top:0">Patch notes</h3>${PATCH_NOTES.map(e=>pnHTML(e)).join('')}<div class="note">Version ${APP_LABEL}</div></div>`;
 }
-function pnHTML(e){return `<div class="pn ${e.v===APP_VERSION?'cur':''}"><b>v${e.v} · ${esc(e.title)}</b> <span class="note">${esc(e.date)}</span><ul>${e.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul></div>`}
+function pnHTML(e){return `<div class="pn ${e.v===APP_VERSION?'cur':''}"><b>v${esc(e.label||e.v)} ·${esc(e.title)}</b> <span class="note">${esc(e.date)}</span><ul>${e.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul></div>`}
 function checkWhatsNew(fresh){
   let last=null;try{last=parseInt(localStorage.getItem('shranck_lastSeenVer'),10)}catch(e){}
   const save=()=>{try{localStorage.setItem('shranck_lastSeenVer',String(APP_VERSION))}catch(e){}};
@@ -405,13 +446,31 @@ $('#admBtn').onclick=()=>{
 function renderAdmin(){
   if(!ADM_RID||!S.rounds[ADM_RID])ADM_RID=S.currentRoundId;
   const R=admRound();
-  const tabs=[['grid','Orders'],['setup','Round setup'],['names','Names'],['rounds','Rounds & export']];
+  const tabs=[['grid','Orders'],['hist','History'],['setup','Round setup'],['names','Names'],['rounds','Rounds & export']];
   let h=`<div class="row2" style="margin:8px 0"><label class="note">Round</label><select id="admRound">${Object.values(S.rounds).sort((a,b)=>b.createdAt-a.createdAt).map(r=>`<option value="${esc(r.id)}"${r.id===ADM_RID?'selected':''}>${esc(r.title)}${r.id===S.currentRoundId?' (current)':''}${r.status==='locked'?' 🔒':''}</option>`).join('')}</select></div>
   <div class="sub">${tabs.map(t=>`<button data-at="${t[0]}" class="${ADM_TAB===t[0]?'on':''}">${t[1]}</button>`).join('')}</div><div id="admBody"></div>`;
   $('#main').innerHTML=h;
   $('#admRound').onchange=e=>{ADM_RID=e.target.value;renderAdmin()};
   document.querySelectorAll('[data-at]').forEach(b=>b.onclick=()=>{ADM_TAB=b.dataset.at;renderAdmin()});
-  ({grid:adminGrid,setup:adminSetup,names:adminNames,rounds:adminRounds})[ADM_TAB]($('#admBody'),R);
+  ({grid:adminGrid,hist:adminHistory,setup:adminSetup,names:adminNames,rounds:adminRounds})[ADM_TAB]($('#admBody'),R);
+}
+let HIST_ITEM='';
+function adminHistory(el,R){
+  const items=[];R.blocks.forEach(b=>b.items.forEach(i=>items.push(i)));
+  const pname=(id,snap)=>S.people[id]?S.people[id].name:(snap?snap+' (removed)':'(removed)');
+  // 1) priority per item: who got in first
+  let h=`<div class="note">Times are when each person first added the item (from 0). Admin edits are marked. Orders placed before v1.1 show "before history began".</div><h3>Who ordered first</h3>`;
+  const withOrders=items.filter(i=>itemTotals(R,i.id).total>0);
+  h+=withOrders.length?`<div class="items">${withOrders.map(i=>{const t=itemTotals(R,i.id),pr=orderPriority(R,i.id);
+    return `<div class="card"><div class="i-head"><div class="i-name">${esc(i.name)}</div>${t.aligned?'<span class="pill on">lines up</span>':`<span class="pill err">${t.short} short</span>`}</div>
+    <ol class="prio">${pr.map(x=>`<li><b>${esc(pname(x.pid))}</b> — ${x.qty} ${esc(i.unit)}${x.qty===1?'':'s'} <span class="note">· ${esc(fmtT(x.since))}</span></li>`).join('')}</ol></div>`}).join('')}</div>`:'<div class="card empty">No orders yet.</div>';
+  // 2) full change log, newest first
+  const all=Object.keys(R.log||{}).map(k=>R.log[k]).filter(e=>!HIST_ITEM||e.i===HIST_ITEM).sort((a,b)=>(b.u||b.t)-(a.u||a.t));
+  h+=`<h3>All changes</h3><div class="row2" style="margin-bottom:8px"><select id="hItem"><option value="">All items</option>${items.map(i=>`<option value="${esc(i.id)}"${HIST_ITEM===i.id?' selected':''}>${esc(i.name)}</option>`).join('')}</select><span class="note">${all.length} change${all.length===1?'':'s'}</span></div>`;
+  h+=all.length?`<div class="tw"><table class="g hist"><thead><tr><th>When</th><th>Person</th><th>Item</th><th>Change</th></tr></thead><tbody>${all.slice(0,500).map(e=>{const it=findItem(R,e.i);
+    return `<tr><td class="n">${esc(fmtT(e.u||e.t))}</td><td>${esc(pname(e.p,e.n))}</td><td>${esc(it?it.name:(e.m||'(removed item)'))}</td><td class="n">${e.f} → <b>${e.q}</b>${e.a?' <span class="pill">admin</span>':''}</td></tr>`}).join('')}</tbody></table></div>${all.length>500?'<div class="note">Showing the latest 500.</div>':''}`:'<div class="card empty">No changes recorded yet.</div>';
+  el.innerHTML=h;
+  $('#hItem').onchange=e=>{HIST_ITEM=e.target.value;adminHistory(el,R)};
 }
 function peopleSorted(){return Object.values(S.people).sort((a,b)=>(a.added-b.added)||a.name.localeCompare(b.name))}
 function adminGrid(el,R){
@@ -431,20 +490,23 @@ function adminGrid(el,R){
     <tr class="foot"><td>Variance</td>${tots.map((t,k)=>t.total===0?'<td>–</td>':t.aligned?'<td class="good">✓ 0</td>':`<td class="bad"><button class="btn sm" data-gap="${esc(b.items[k].id)}">${t.short} short · resolve</button></td>`).join('')}<td></td></tr></tbody></table></div>`;
   });
   el.innerHTML=h;
-  el.querySelectorAll('[data-gq]').forEach(i=>i.onchange=()=>{const[p,it]=i.dataset.gq.split('|'),item=findItem(R,it);if(!item)return;setQty(S,R.id,p,it,snapQty(i.value,item.step));persist([`rounds/${R.id}/orders/${p}/${it}`]);rerenderKeepFocus()});
+  el.querySelectorAll('[data-gq]').forEach(i=>i.onchange=()=>{const[p,it]=i.dataset.gq.split('|'),item=findItem(R,it);if(!item)return;persist(setQtyLogged(R,p,item,i.value,true));rerenderKeepFocus()});
   el.querySelectorAll('[data-gap]').forEach(b=>b.onclick=()=>openGap(R.id,b.dataset.gap));
 }
 function openGap(rid,itemId){
   const R=S.rounds[rid],it=findItem(R,itemId);if(!it)return;
   const draw=()=>{
-    const t=itemTotals(R,itemId),ppl=peopleSorted();
+    // people who ordered it first come first (priority when cutting), then everyone else
+    const t=itemTotals(R,itemId),pr=orderPriority(R,itemId),rank={};pr.forEach((x,k)=>rank[x.pid]=k);
+    const ppl=[...pr.map(x=>S.people[x.pid]).filter(Boolean),...peopleSorted().filter(p=>!(p.id in rank))];
+    const tag=p=>p.id in rank?`<div class="note">#${rank[p.id]+1} · since ${esc(fmtT(pr[rank[p.id]].since))}</div>`:'';
     const up=t.aligned?0:t.short,down=t.over;
     $('#modal').innerHTML=`<h2>${esc(it.name)}</h2>
     <div class="case ${t.aligned?'ok':'warn'}" style="margin:0 0 10px">${t.aligned?`✓ Lines up: ${t.total} ${esc(it.unit)}${t.total===1?'':'s'} = ${t.fullCases} case${t.fullCases===1?'':'s'}`:`Total ${t.total} · ${it.incPerCase} per case. Add <b>${up}</b> to reach ${t.fullCases+1} cases${t.fullCases>0?`, or remove <b>${down}</b> to drop to ${t.fullCases}`:''}.`}</div>
-    <div class="note">Adjust anyone's quantity below. Changes apply to costs immediately.</div>
-    <div style="max-height:46vh;overflow:auto;margin-top:8px">${ppl.map(p=>`<div class="row2" style="justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)"><span>${esc(p.name)}</span><span class="stepper"><button data-gd="${esc(p.id)}">−</button><input type="number" min="0" step="${esc(it.step)}" value="${esc(num(R.orders[p.id]&&R.orders[p.id][itemId])||'')}" placeholder="0" data-gi="${esc(p.id)}"><button data-gu="${esc(p.id)}">+</button></span></div>`).join('')}</div>
+    <div class="note">People who ordered first are listed first. Adjust anyone's quantity below; costs update immediately.</div>
+    <div style="max-height:46vh;overflow:auto;margin-top:8px">${ppl.map(p=>`<div class="row2" style="justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)"><span>${esc(p.name)}${tag(p)}</span><span class="stepper"><button data-gd="${esc(p.id)}">−</button><input type="number" min="0" step="${esc(it.step)}" value="${esc(num(R.orders[p.id]&&R.orders[p.id][itemId])||'')}" placeholder="0" data-gi="${esc(p.id)}"><button data-gu="${esc(p.id)}">+</button></span></div>`).join('')}</div>
     <div class="row2" style="justify-content:flex-end;margin-top:14px"><button class="btn" id="gDone">Done</button></div>`;
-    const set=(pid,q)=>{setQty(S,rid,pid,itemId,snapQty(q,it.step));persist([`rounds/${rid}/orders/${pid}/${itemId}`]);draw()};
+    const set=(pid,q)=>{persist(setQtyLogged(R,pid,it,q,true));draw()};
     $('#modal').querySelectorAll('[data-gd]').forEach(b=>b.onclick=()=>set(b.dataset.gd,Math.max(0,num(R.orders[b.dataset.gd]&&R.orders[b.dataset.gd][itemId])-it.step)));
     $('#modal').querySelectorAll('[data-gu]').forEach(b=>b.onclick=()=>set(b.dataset.gu,num(R.orders[b.dataset.gu]&&R.orders[b.dataset.gu][itemId])+it.step));
     $('#modal').querySelectorAll('[data-gi]').forEach(i=>i.onchange=()=>set(i.dataset.gi,i.value));

@@ -2,7 +2,7 @@ const fs = require('fs'), assert = require('assert'), path = require('path');
 const html = fs.readFileSync(path.join(__dirname, process.env.SHRANCK_HTML || 'index.html'), 'utf8');
 const m = html.match(/\/\/ <core>([\s\S]*?)\/\/ <\/core>/);
 assert(m, 'core block missing');
-const C = new Function(m[1] + '; return {num,personCost,itemTotals,normalize,seedState,findPersonByName,mergePeople,deletePerson,setQty,uid,validId,snapQty,setPath,compactPaths}')();
+const C = new Function(m[1] + '; return {num,personCost,itemTotals,normalize,seedState,findPersonByName,mergePeople,deletePerson,setQty,uid,validId,snapQty,setPath,compactPaths,logChange,orderPriority,normLog}')();
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('ok -', name); };
 const near = (a, b) => assert(Math.abs(a - b) < 1e-6, a + ' != ' + b);
 
@@ -113,5 +113,34 @@ t('setPath creates parents and deletes leaves', () => {
 });
 t('compactPaths dedupes and drops descendants of included paths', () => {
   assert.deepStrictEqual(C.compactPaths(['a/b', 'a/b/c', 'a/bc', 'a/b', 'people/x']).sort(), ['a/b', 'a/bc', 'people/x']);
+});
+t('logChange records, folds quick repeats, drops net-zero', () => {
+  const R = { orders: {}, log: {} };
+  const a = C.logChange(R, 'p1', 'i1', 0, 1, false, 'A', 'Item', 1000);
+  assert(a && R.log[a].f === 0 && R.log[a].q === 1 && R.log[a].t === 1000);
+  assert.strictEqual(C.logChange(R, 'p1', 'i1', 1, 3, false, 'A', 'Item', 60000), a); // within 2 min of last touch
+  assert.strictEqual(R.log[a].q, 3); assert.strictEqual(R.log[a].t, 1000);
+  const b = C.logChange(R, 'p1', 'i1', 3, 2, true, 'A', 'Item', 70000); // admin edit = separate entry
+  assert(b !== a && R.log[b].a === 1);
+  const c = C.logChange(R, 'p1', 'i1', 2, 4, false, 'A', 'Item', 999999); // later = new entry
+  assert(c !== a && c !== b);
+  C.logChange(R, 'p1', 'i1', 4, 2, false, 'A', 'Item', 1000000); assert(!R.log[c]); // back to start = removed
+  assert.strictEqual(C.logChange(R, 'p1', 'i1', 2, 2, false, 'A', 'Item', 1), null);
+});
+t('orderPriority: earliest own from-0 first, unknown last', () => {
+  const R = { orders: { a: { i: 1 }, b: { i: 2 }, c: { i: 1 }, d: { j: 1 } }, log: {} };
+  C.logChange(R, 'b', 'i', 0, 2, false, 'B', 'I', 100);
+  C.logChange(R, 'a', 'i', 0, 1, false, 'A', 'I', 500);
+  C.logChange(R, 'b', 'i', 2, 0, false, 'B', 'I', 1e6); C.logChange(R, 'b', 'i', 0, 2, false, 'B', 'I', 2e6); // b dropped out and rejoined later
+  const p = C.orderPriority(R, 'i');
+  assert.deepStrictEqual(p.map(x => x.pid), ['a', 'b', 'c']);
+  assert.strictEqual(p[0].since, 500); assert.strictEqual(p[1].since, 2e6); assert.strictEqual(p[2].since, null);
+});
+t('normalize keeps a valid log and drops junk entries', () => {
+  const s = C.seedState(); const r = s.rounds[s.currentRoundId];
+  r.log = { h1: { t: 5, p: 'p1', i: 'i_tuna', f: 0, q: 2, a: 0, n: 'A', m: 'Tuna' }, 'x y': { t: 5, p: 'p1', i: 'i' }, h2: { t: 0, p: 'p1', i: 'i' }, h3: { t: 5, p: 'bad id', i: 'i' } };
+  const n2 = C.normalize(JSON.parse(JSON.stringify(s)));
+  assert.deepStrictEqual(Object.keys(n2.rounds[r.id].log), ['h1']); assert.strictEqual(n2.rounds[r.id].log.h1.q, 2);
+  assert.deepStrictEqual(C.normalize({}).rounds[C.normalize({}).currentRoundId].log, {});
 });
 console.log(n + ' tests passed');
