@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shranck App</title>
+<title>ShranCk App</title>
 <meta name="theme-color" content="#006a6b">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="favicon.ico" sizes="any">
@@ -105,7 +105,7 @@ h3{margin:18px 0 6px}
 </head>
 <body>
 <header><div class="hin">
-  <h1><img class="logo" src="logo.png" alt=""><span>Shranck App</span></h1>
+  <h1><img class="logo" src="logo.png" alt=""><span>ShranCk App</span></h1>
   <nav class="tabs" id="tabs"></nav>
   <span id="sync" class="pill">Connecting…</span>
   <button class="ibtn" id="meBtn" title="Who am I" style="width:auto;border-radius:99px;padding:0 14px;font-size:14px;font-weight:600"></button>
@@ -248,9 +248,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=9; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_VERSION=10; // build number (= sw.js cache shranck-shell-vN); users see the label
 const APP_LABEL='1.2';
-const PATCH_NOTES=[{v:9,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Shranck App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const PATCH_NOTES=[{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['App name is now ShranCk App','Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays ShranCk App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
