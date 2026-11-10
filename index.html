@@ -47,7 +47,7 @@ main{max-width:1200px;margin:0 auto;padding:12px 16px}
 .banner{background:var(--surf2);border-radius:20px;padding:14px 16px;margin:10px 0;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
 .banner b{font-size:18px}.banner .d{display:flex;gap:6px;align-items:center}
 .card{background:var(--surf);border-radius:24px;padding:16px;box-shadow:var(--shadow);margin:10px 0}
-.blocktitle{font-size:22px;font-weight:700;margin:22px 0 4px}
+.blocktitle{font-size:22px;font-weight:700;margin:22px 0 4px}#main>.blocktitle:first-child{margin-top:4px}
 .items{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 .items .card{margin:0}
 .i-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -109,7 +109,7 @@ h3{margin:18px 0 6px}
   <nav class="tabs" id="tabs"></nav>
   <span id="sync" class="pill">Connecting…</span>
   <button class="ibtn" id="meBtn" title="Who am I" style="width:auto;border-radius:99px;padding:0 14px;font-size:14px;font-weight:600"></button>
-  <button class="ibtn" id="admBtn" title="Admin">🔓</button>
+  <button class="ibtn" id="admBtn" title="Admin">🔒</button>
   <button class="ibtn" id="themeBtn" title="Theme">☾</button>
 </div></header>
 <main id="main"></main>
@@ -248,9 +248,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=7; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_VERSION=8; // build number (= sw.js cache shranck-shell-vN); users see the label
 const APP_LABEL='1.2';
-const PATCH_NOTES=[{v:7,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are now evenly spaced with centered symbols','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Shranck App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const PATCH_NOTES=[{v:8,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are now evenly spaced with centered symbols','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Shranck App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
@@ -341,7 +341,7 @@ $('#themeBtn').onclick=()=>{const t=document.documentElement.getAttribute('data-
 /* ---- rendering ---- */
 function renderAll(){
   document.body.classList.toggle('admin',ADM);
-  $('#admBtn').textContent=ADM?'🔒':'🔓';$('#admBtn').disabled=!READY;$('#admBtn').title=READY?'Admin':'Connecting…';
+  $('#admBtn').textContent=ADM?'🔓':'🔒';$('#admBtn').disabled=!READY;$('#admBtn').title=READY?'Admin':'Connecting…';
   const m=me();$('#meBtn').textContent=m?'👤 '+S.people[m].name:READY?'👤 Who are you?':'Connecting…';$('#meBtn').disabled=!READY;
   const tabs=[['order','Order'],...(ADM?[['admin','Admin']]:[]),['help','Help']];
   if(!tabs.some(t=>t[0]===TAB))TAB='order';
@@ -370,7 +370,7 @@ function itemCard(R,b,it,editable){
 }
 function renderOrder(){
   const R=cur(),locked=R.status==='locked',m=me(),editable=!!m&&!locked&&READY;
-  let h=`<div class="note" style="margin-top:8px">${esc(R.title)}${locked?' · 🔒 ordering is closed':''}</div>`;
+  let h=locked?'<div class="note" style="margin-top:4px">🔒 Ordering is closed</div>':'';
   if(!m)h+=`<div class="card"><b>Pick your name to start ordering.</b><div style="margin-top:10px"><button class="btn" id="nameStart" ${READY?'':'disabled'}>${READY?'Who are you?':'Connecting…'}</button></div></div>`;
   R.blocks.forEach(b=>{
     h+=`<div class="blocktitle">${esc(b.title)}</div><div class="banner"><div class="d">📅 <span>Delivery:</span> <b>${esc(b.delivery||'TBD')}</b></div>${b.deadline?`<div class="d">⏰ <span>Order by:</span> <b>${esc(b.deadline)}</b></div>`:''}${b.note?`<div class="note" style="flex-basis:100%">${esc(b.note)}</div>`:''}</div>`;
@@ -457,12 +457,13 @@ function renderAdmin(){
   if(!ADM_RID||!S.rounds[ADM_RID])ADM_RID=S.currentRoundId;
   const R=admRound();
   const tabs=[['grid','Orders'],['hist','History'],['setup','Round setup'],['names','Names'],['rounds','Rounds & export']];
-  let h=`<div class="row2" style="margin:8px 0"><label class="note">Round</label><select id="admRound">${Object.values(S.rounds).sort((a,b)=>b.createdAt-a.createdAt).map(r=>`<option value="${esc(r.id)}"${r.id===ADM_RID?'selected':''}>${esc(r.title)}${r.id===S.currentRoundId?' (current)':''}${r.status==='locked'?' 🔒':''}</option>`).join('')}</select></div>
+  let h=`<div class="row2" style="margin:8px 0"><label class="note">Round</label><select id="admRound">${Object.values(S.rounds).sort((a,b)=>b.createdAt-a.createdAt).map(r=>`<option value="${esc(r.id)}"${r.id===ADM_RID?'selected':''}>${esc(r.title)}${r.id===S.currentRoundId?' (current)':''}${r.status==='locked'?' 🔒':''}</option>`).join('')}</select><button class="btn tonal sm" id="admNewR" ${ADM_EDIT?'':'disabled title="Tap Edit first"'}>+ New round</button></div>
   <div class="editbar"><span class="note">${ADM_EDIT?'<b style="color:var(--primary)">Editing</b> — changes save as you make them.':'View only. Tap <b>Edit</b> to make changes.'}</span><button class="btn ${ADM_EDIT?'':'tonal'} sm" id="admEdit">${ADM_EDIT?'✓ Done editing':'✎ Edit'}</button></div>
   <div class="sub">${tabs.map(t=>`<button data-at="${t[0]}" class="${ADM_TAB===t[0]?'on':''}">${t[1]}</button>`).join('')}</div><div id="admBody"></div>`;
   $('#main').innerHTML=h;
   $('#admRound').onchange=e=>{ADM_RID=e.target.value;renderAdmin()};
   document.querySelectorAll('[data-at]').forEach(b=>b.onclick=()=>{ADM_TAB=b.dataset.at;renderAdmin()});
+  $('#admNewR').onclick=()=>openModal(`<h2>New round</h2><div class="note">Copies the categories and items (with prices) from <b>${esc(R.title)}</b>, with no orders or dates. It becomes the current round everyone orders in.</div><div class="field" style="margin-top:10px"><input id="nrT2" placeholder="e.g. Dec 2026" maxlength="40"></div><div class="row2" style="justify-content:flex-end"><button class="btn ghost" id="nrX">Cancel</button><button class="btn" id="nrOk">Create</button></div>`,()=>{$('#nrX').onclick=closeModal;$('#nrT2').focus();$('#nrOk').onclick=()=>{const t=$('#nrT2').value.trim();if(!t){toast('Enter a round name');return}closeModal();newRoundFrom(R,t)}});
   $('#admEdit').onclick=()=>{ADM_EDIT=!ADM_EDIT;renderAdmin()};
   const body=$('#admBody');
   ({grid:adminGrid,hist:adminHistory,setup:adminSetup,names:adminNames,rounds:adminRounds})[ADM_TAB](body,R);
@@ -584,9 +585,13 @@ function adminRounds(el,R){
   $('#renR').onclick=()=>openModal(`<h2>Rename round</h2><div class="field"><input id="rrT" value="${esc(R.title)}"></div><div class="row2" style="justify-content:flex-end"><button class="btn ghost" id="rrX">Cancel</button><button class="btn" id="rrOk">Save</button></div>`,()=>{$('#rrX').onclick=closeModal;$('#rrOk').onclick=()=>{const v=$('#rrT').value.trim();if(v){R.title=v;persist([`rounds/${R.id}/title`])}closeModal();renderAll()}});
   $('#nrB').onclick=()=>{
     const t=$('#nrT').value.trim();if(!t){toast('Enter a round name');return}
+    newRoundFrom(R,t);
+  };
+}
+function newRoundFrom(R,t){{
     const id=uid('r'),n={id,title:t,status:'open',createdAt:Date.now(),orders:{},blocks:R.blocks.map(b=>({id:uid('b'),title:b.title,delivery:'',deadline:'',note:b.note,items:b.items.map(i=>Object.assign({},i,{id:uid('i')}))}))};
     S.rounds[id]=n;S.currentRoundId=id;ADM_RID=id;persist([`rounds/${id}`,'currentRoundId']);ADM_TAB='setup';renderAll();toast('New round created — set dates and prices');
-  };
+  }
 }
 
 /* ---- Excel export ---- */
