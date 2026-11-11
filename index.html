@@ -82,6 +82,8 @@ body.onorder .mascot{width:min(480px,calc((100vw - 1000px)/2 - 26px),calc(100vh 
 #nope.open{display:flex;animation:nopeIn .18s ease-out}
 #nope img{width:min(78vmin,640px);aspect-ratio:1;border-radius:36px;box-shadow:0 20px 80px rgba(0,0,0,.6);animation:nopeShake .5s .1s}
 #nope b{font:900 min(34vmin,260px)/.9 system-ui,sans-serif;color:#ff2a2a;-webkit-text-stroke:min(1.4vmin,10px) #fff;paint-order:stroke;letter-spacing:.04em;margin-top:-.42em;text-shadow:0 10px 40px rgba(0,0,0,.6);animation:nopeShake .5s .1s}
+#nope.warn{background:rgba(0,0,0,.5)}
+#nope.warn b{font-size:min(11vmin,84px);line-height:1;color:#fff;-webkit-text-stroke:min(.6vmin,5px) #1a1a1a;margin-top:-.6em;letter-spacing:.01em;text-align:center}
 #nope small{color:#fff;font-weight:700;font-size:18px;margin-top:10px;text-shadow:0 2px 8px #000}
 @keyframes nopeIn{from{opacity:0;transform:scale(1.15)}}
 @keyframes nopeShake{0%,100%{transform:none}20%{transform:translateX(-18px) rotate(-3deg)}40%{transform:translateX(16px) rotate(3deg)}60%{transform:translateX(-10px)}80%{transform:translateX(6px)}}
@@ -149,6 +151,7 @@ h3{margin:18px 0 6px}
 <div class="mascot l" aria-hidden="true"></div><div class="mascot r" aria-hidden="true"></div>
 <div id="costbar" class="costbar hide"></div>
 <div id="nope" role="alertdialog" aria-label="No"><img src="angry-512.jpg" alt="Schrank, angry"><b>NO</b><small>That one only comes whole. Click to close.</small></div>
+<img src="crossarm-512.jpg" alt="" hidden>
 <div class="overlay" id="ov"><div class="modal" id="modal"></div></div>
 <div class="toast" id="toast"></div>
 
@@ -285,9 +288,9 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=28; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_VERSION=29; // build number (= sw.js cache shranck-shell-vN); users see the label
 const APP_LABEL='1.5';
-const PATCH_NOTES=[{v:28,label:'1.5',date:'2026-11-10',title:'Pick a date',notes:['Admin: delivery and order-by dates now use a calendar picker','Order page: removed the tiny up/down arrows in the quantity boxes — use − / +','Try ordering half of something that only comes whole. Go on.']},{v:21,label:'1.4',date:'2026-11-10',title:'He’s watching you',notes:['New unimpressed photo on the Help page','Photos no longer open bigger when you click them','On big desktop screens, two giant mascots watch you from the sides of the Order page','Their eyes follow your mouse wherever it goes, and they blink']},{v:17,label:'1.3',date:'2026-11-10',title:'Table view + locking',notes:['Bigger logo — tap it to see it full size','Home-screen icon is now the logo too','App name is now Schrank App',"Tap “🔒 I'm done” at the bottom to lock your order; tap Unlock to change it, until the admin locks everyone",'Admin: “Lock everyone” button at the top, and a 🔒 next to people who are done','Order page: switch between Cards and a compact Table view (top right)','Table shows price, per-unit cost, your order, your cost and case status in one row per item','Your choice is remembered on this device']},{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Schrank App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const PATCH_NOTES=[{v:29,label:'1.5',date:'2026-11-10',title:'Pick a date',notes:['Admin: delivery and order-by dates now use a calendar picker','Order page: removed the tiny up/down arrows in the quantity boxes — use − / +','Try ordering half of something that only comes whole. Go on.']},{v:21,label:'1.4',date:'2026-11-10',title:'He’s watching you',notes:['New unimpressed photo on the Help page','Photos no longer open bigger when you click them','On big desktop screens, two giant mascots watch you from the sides of the Order page','Their eyes follow your mouse wherever it goes, and they blink']},{v:17,label:'1.3',date:'2026-11-10',title:'Table view + locking',notes:['Bigger logo — tap it to see it full size','Home-screen icon is now the logo too','App name is now Schrank App',"Tap “🔒 I'm done” at the bottom to lock your order; tap Unlock to change it, until the admin locks everyone",'Admin: “Lock everyone” button at the top, and a 🔒 next to people who are done','Order page: switch between Cards and a compact Table view (top right)','Table shows price, per-unit cost, your order, your cost and case status in one row per item','Your choice is remembered on this device']},{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Schrank App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,ORDER_VIEW=(()=>{try{return localStorage.getItem('shranck_view')==='table'?'table':'cards'}catch(e){return 'cards'}})(),TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
@@ -480,10 +483,16 @@ function renderCostBar(){
     if(R.done[m]){delete R.done[m];toast('Unlocked — you can change your order')}else{R.done[m]=Date.now();toast('Locked — your order is saved')}
     persist([`rounds/${R.id}/done/${m}`]);renderAll()};
 }
-function showNope(){const n=$('#nope');n.classList.remove('open');void n.offsetWidth;n.classList.add('open')}
+const NOPE_N={};
+function showNope(itemId){const n=$('#nope'),k=NOPE_N[itemId]=(NOPE_N[itemId]||0)+1,warn=k===1;
+  n.classList.toggle('warn',warn);n.setAttribute('aria-label',warn?"You can't do that":'No');
+  const im=n.querySelector('img');im.src=warn?'crossarm-512.jpg':'angry-512.jpg';im.alt=warn?'Schrank, arms folded':'Schrank, angry';
+  n.querySelector('b').textContent=warn?"You can't do that":'NO';
+  n.querySelector('small').textContent=(warn?'That one only comes whole.':'I said it only comes whole.')+' Click to close.';
+  n.classList.remove('open');void n.offsetWidth;n.classList.add('open')}
 function changeQty(itemId,q){
   const R=cur(),it=findItem(R,itemId);if(!me()||R.status==='locked'||R.done[me()]||!it||!READY)return;
-  if(num(it.step)>=1&&num(q)%1!==0){showNope();rerenderKeepFocus();return}
+  if(num(it.step)>=1&&num(q)%1!==0){showNope(itemId);rerenderKeepFocus();return}
   persist(setQtyLogged(R,me(),it,q,false));rerenderKeepFocus();
 }
 // set a qty + record it in the round's history; returns the leaf paths to write (never the whole, possibly stale, order map)
