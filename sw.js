@@ -1,4 +1,4 @@
-const CACHE='shranck-shell-v38';
+const CACHE='shranck-shell-v39';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icon.svg','icon-192.png','icon-512.png','favicon.ico','favicon.png','logo.png','logo-512.jpg','mascot.png','help-512.jpg','kaching.png','unimpressed.png','watch1.png','watch2.png','watch3.png','angry-512.jpg','crossarm-512.jpg','finger-512.jpg','icon-mask-192.png','icon-mask-512.png','apple-touch-icon.png']).catch(()=>{})));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{
