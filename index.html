@@ -136,6 +136,12 @@ table.g td:first-child,table.g th:first-child{text-align:left;position:sticky;le
 table.g td:first-child{background:var(--surf)}
 table.g input{width:62px;padding:5px;text-align:center;border-radius:8px}
 table.g tr.foot td{background:var(--surf2);font-weight:700}
+.agbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 10px}.agbar .sub{margin:0}.agbar .sub button b{opacity:.75;margin-left:4px}
+.agbar input[type=search]{flex:1 1 180px;min-width:140px;padding:7px 12px;border-radius:99px}.agbar select{padding:6px 10px;border-radius:99px}
+.agbar label.tg{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer}
+table.g.sum td,table.g.sum th{text-align:left}table.g.sum tbody tr[data-jump]{cursor:pointer}table.g.sum tbody tr[data-jump]:hover td{background:var(--surf2)}
+.st{font-size:12px;padding:2px 9px;border-radius:99px;background:var(--surf2);white-space:nowrap}.st.locked{background:var(--okc);color:var(--ok)}.st.none{background:var(--errc);color:var(--err)}
+table.g tr.flash td{animation:agf 1.6s ease}@keyframes agf{0%,40%{background:var(--pc)}}
 td.bad{}td.good{color:var(--ok)}
 .itemrow{display:grid;grid-template-columns:2fr 2fr 1fr 1fr 1fr 1fr 1fr auto;gap:6px;align-items:end;margin:8px 0;padding:10px;background:var(--surf2);border-radius:16px}
 @media(max-width:760px){.itemrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
@@ -301,9 +307,10 @@ function mergePeople(S,from,to){
 // </core>
 
 /* ======================= APP ======================= */
-const APP_VERSION=40; // build number (= sw.js cache shranck-shell-vN); users see the label
+const APP_VERSION=41; // build number (= sw.js cache shranck-shell-vN); users see the label
 const APP_LABEL='1.5';
-const PATCH_NOTES=[{v:40,label:'1.6',date:'2026-11-11',title:'Find your name',notes:['Who are you? now has a search box at the top','Start typing your name to narrow the list','Not in the list? The button shows you’re adding yourself as someone new']},{v:39,label:'1.5',date:'2026-11-10',title:'Pick a date',notes:['Admin: delivery and order-by dates now use a calendar picker','Order page: removed the tiny up/down arrows in the quantity boxes — use − / +','Try ordering half of something that only comes whole. Go on.']},{v:21,label:'1.4',date:'2026-11-10',title:'He’s watching you',notes:['New unimpressed photo on the Help page','Photos no longer open bigger when you click them','On big desktop screens, two giant mascots watch you from the sides of the Order page','Their eyes follow your mouse wherever it goes, and they blink']},{v:17,label:'1.3',date:'2026-11-10',title:'Table view + locking',notes:['Bigger logo — tap it to see it full size','Home-screen icon is now the logo too','App name is now Schrank App',"Tap “🔒 I'm done” at the bottom to lock your order; tap Unlock to change it, until the admin locks everyone",'Admin: “Lock everyone” button at the top, and a 🔒 next to people who are done','Order page: switch between Cards and a compact Table view (top right)','Table shows price, per-unit cost, your order, your cost and case status in one row per item','Your choice is remembered on this device']},{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Schrank App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+const PATCH_NOTES=[{v:41,label:'1.7',date:'2026-11-12',title:'Sort out the orders',notes:['Admin Orders: filter by 🔒 Locked, Ordering, or Not ordered (people with a name but no order yet), with counts','Admin: one tap copies the names of everyone who hasn’t ordered, ready to paste in a chat','Admin: sort by name, biggest or smallest order, or most recent change, and search for a name','Admin: hide items nobody has ordered','Admin: new People table with each person’s status, item count, cost and last change; tap a row to jump to them']},{v:40,label:'1.6',date:'2026-11-11',title:'Find your name',notes:['Who are you? now has a search box at the top','Start typing your name to narrow the list','Not in the list? The button shows you’re adding yourself as someone new']},{v:39,label:'1.5',date:'2026-11-10',title:'Pick a date',notes:['Admin: delivery and order-by dates now use a calendar picker','Order page: removed the tiny up/down arrows in the quantity boxes — use − / +','Try ordering half of something that only comes whole. Go on.']},{v:21,label:'1.4',date:'2026-11-10',title:'He’s watching you',notes:['New unimpressed photo on the Help page','Photos no longer open bigger when you click them','On big desktop screens, two giant mascots watch you from the sides of the Order page','Their eyes follow your mouse wherever it goes, and they blink']},{v:17,label:'1.3',date:'2026-11-10',title:'Table view + locking',notes:['Bigger logo — tap it to see it full size','Home-screen icon is now the logo too','App name is now Schrank App',"Tap “🔒 I'm done” at the bottom to lock your order; tap Unlock to change it, until the admin locks everyone",'Admin: “Lock everyone” button at the top, and a 🔒 next to people who are done','Order page: switch between Cards and a compact Table view (top right)','Table shows price, per-unit cost, your order, your cost and case status in one row per item','Your choice is remembered on this device']},{v:10,label:'1.2',date:'2026-11-10',title:'Nicer buttons + safer admin',notes:['Quantity − / + buttons are evenly spaced, with symbols drawn perfectly centered','Buttons animate when you hover or press them','Admin: view-only until you tap Edit, so nothing changes by accident','Admin: “+ New round” button next to the round picker','Order page: removed the round label so the menu starts higher','Admin button shows 🔒 when admin is off and 🔓 when it’s on','Admin: shortfalls no longer highlighted yellow','Cleaner layout: a taller top bar with the tabs in it, lined up with the page']},{v:3,label:'1.1',date:'2026-11-10',title:'Order history',notes:['New logo in the header (tab title stays Schrank App)','Admin: new History tab shows who ordered each item first, plus every change with its time','Admin: the case-gap fixer now lists people earliest-first, so first in keeps priority']},{v:1,label:'1.0',date:'2026-11-10',title:'First release',notes:['Pick your name once, then enter what you want per item','See your estimated cost and the delivery date','Live case tracker shows when an item lines up to full cases','Admin: set up rounds, resolve case gaps, lock, and export to Excel']}];
+let AG=(()=>{const d={f:'all',sort:'name',q:'',hide:false};try{return Object.assign(d,JSON.parse(localStorage.getItem('shranck_agrid')||'{}'),{q:''})}catch(e){return d}})();
 let S,ME=null,ADM=false,ADM_RID=null,ADM_TAB='grid',ADM_EDIT=false,ORDER_VIEW=(()=>{try{return localStorage.getItem('shranck_view')==='table'?'table':'cards'}catch(e){return 'cards'}})(),TAB='order',pending=null,viewBrk=false;
 // READY: first remote snapshot seen, or local-only fallback (sync error / no snapshot within 4s). remoteLoaded: a real snapshot arrived.
 let READY=false,remoteLoaded=false,NAME_OPEN=false,PENDING_PIN=null,QUEUE=new Set();
@@ -635,23 +642,53 @@ function adminHistory(el,R){
   $('#hItem').onchange=e=>{HIST_ITEM=e.target.value;adminHistory(el,R)};
 }
 function peopleSorted(){return Object.values(S.people).sort((a,b)=>(a.added-b.added)||a.name.localeCompare(b.name))}
+// order status of one person in a round: locked (pressed I'm done) / ordering (has items) / none (has a name, ordered nothing)
+function agStatus(R,pid){if(R.done[pid])return 'locked';const o=R.orders[pid]||{};return Object.keys(o).some(k=>num(o[k])>0)?'ordering':'none'}
+function agLast(R,pid){let t=0;const L=R.log||{};for(const k in L){const e=L[k];if(e.p===pid)t=Math.max(t,e.u||e.t)}return t}
+function agSave(){try{localStorage.setItem('shranck_agrid',JSON.stringify({f:AG.f,sort:AG.sort,hide:AG.hide}))}catch(e){}}
 function adminGrid(el,R){
-  const ppl=peopleSorted();
-  if(!ppl.length){el.innerHTML='<div class="card empty">No one has added their name yet.</div>';return}
-  let h='';
-  R.blocks.forEach(b=>{
-    h+=`<h3>${esc(b.title)}</h3><div class="tw"><table class="g"><thead><tr><th>Person</th>${b.items.map(i=>`<th>${esc(i.name)}<div class="note">${esc(i.unit)}</div></th>`).join('')}<th>Est. cost</th></tr></thead><tbody>`;
-    ppl.forEach(p=>{
-      const c=personCost(R,p.id);
-      h+=`<tr><td>${esc(p.name)}${R.done[p.id]?' <span title="Locked their order" style="opacity:.8">🔒</span>':''}</td>${b.items.map(i=>`<td><input type="number" min="0" step="${esc(i.step)}" value="${esc(num(R.orders[p.id]&&R.orders[p.id][i.id])||'')}" data-gq="${esc(p.id+'|'+i.id)}"></td>`).join('')}<td>${money(b.items.reduce((s,i)=>s+personCost({blocks:[{items:[i]}],orders:R.orders},p.id).total,0))}</td></tr>`;
+  const everyone=peopleSorted();
+  if(!everyone.length){el.innerHTML='<div class="card empty">No one has added their name yet.</div>';return}
+  const info={};everyone.forEach(p=>{const c=personCost(R,p.id);info[p.id]={st:agStatus(R,p.id),cost:c.total,n:c.lines.length,tbd:c.lines.some(l=>l.priceTbd),last:agLast(R,p.id)}});
+  const cnt={all:everyone.length,locked:0,ordering:0,none:0};everyone.forEach(p=>cnt[info[p.id].st]++);
+  const q=AG.q.trim().toLowerCase();
+  let ppl=everyone.filter(p=>(AG.f==='all'||info[p.id].st===AG.f)&&(!q||p.name.toLowerCase().includes(q)));
+  const by={name:(a,b)=>a.name.localeCompare(b.name),big:(a,b)=>info[b.id].cost-info[a.id].cost||a.name.localeCompare(b.name),small:(a,b)=>info[a.id].cost-info[b.id].cost||a.name.localeCompare(b.name),recent:(a,b)=>info[b.id].last-info[a.id].last||a.name.localeCompare(b.name)};
+  ppl=ppl.sort(by[AG.sort]||by.name);
+  const stLbl={locked:'🔒 Locked',ordering:'Ordering',none:'Not ordered'};
+  let h=`<div class="agbar"><div class="sub">${[['all','All'],['locked','🔒 Locked'],['ordering','Ordering'],['none','Not ordered']].map(([k,l])=>`<button data-agf="${k}" class="${AG.f===k?'on':''}">${l}<b>${cnt[k]}</b></button>`).join('')}</div>${cnt.none?`<button class="btn tonal sm" id="agCopy" title="Copy the names of everyone who hasn't ordered yet">📋 Copy not-ordered names</button>`:''}</div>
+  <div class="agbar"><input type="search" id="agQ" placeholder="Search a name" value="${esc(AG.q)}" autocomplete="off"><select id="agSort" aria-label="Sort">${[['name','Name A–Z'],['big','Biggest order'],['small','Smallest order'],['recent','Most recent change']].map(([k,l])=>`<option value="${k}"${AG.sort===k?' selected':''}>${l}</option>`).join('')}</select><label class="tg"><input type="checkbox" id="agHide"${AG.hide?' checked':''}> Hide items nobody ordered</label></div>`;
+  if(!ppl.length){h+=`<div class="card empty">No one matches${q?` “${esc(AG.q.trim())}”`:''}${AG.f!=='all'?` in ${stLbl[AG.f]}`:''}.</div>`}
+  else{
+    // per-person totals strip: who owes what; tap a row to jump to that person in the grids
+    h+=`<h3>People <span class="note">(${ppl.length}${ppl.length<everyone.length?` of ${everyone.length}`:''})</span></h3><div class="tw"><table class="g sum"><thead><tr><th>Person</th><th>Status</th><th>Items</th><th>Est. cost</th><th>Last change</th></tr></thead><tbody>${ppl.map(p=>{const x=info[p.id];return `<tr data-jump="${esc(p.id)}"><td>${esc(p.name)}</td><td><span class="st ${x.st}">${stLbl[x.st]}</span></td><td>${x.n||'–'}</td><td>${x.n?money(x.cost)+(x.tbd?' <span class="note">+ TBD</span>':''):'–'}</td><td class="note">${x.last?esc(fmtT(x.last)):'–'}</td></tr>`}).join('')}<tr class="foot"><td>Total</td><td></td><td>${ppl.reduce((s,p)=>s+info[p.id].n,0)}</td><td>${money(ppl.reduce((s,p)=>s+info[p.id].cost,0))}</td><td></td></tr></tbody></table></div>`;
+    const lineCost=(i,pid)=>personCost({blocks:[{items:[i]}],orders:R.orders},pid).total;
+    let hidden=0;
+    R.blocks.forEach(b=>{
+      const its=AG.hide?b.items.filter(i=>itemTotals(R,i.id).total>0):b.items;hidden+=b.items.length-its.length;
+      if(!its.length)return;
+      h+=`<h3>${esc(b.title)}</h3><div class="tw"><table class="g"><thead><tr><th>Person</th>${its.map(i=>`<th>${esc(i.name)}<div class="note">${esc(i.unit)}</div></th>`).join('')}<th>Est. cost</th></tr></thead><tbody>`;
+      ppl.forEach(p=>{
+        h+=`<tr data-prow="${esc(p.id)}"><td>${esc(p.name)}${R.done[p.id]?' <span title="Locked their order" style="opacity:.8">🔒</span>':''}</td>${its.map(i=>`<td><input type="number" min="0" step="${esc(i.step)}" value="${esc(num(R.orders[p.id]&&R.orders[p.id][i.id])||'')}" data-gq="${esc(p.id+'|'+i.id)}"></td>`).join('')}<td>${money(its.reduce((s,i)=>s+lineCost(i,p.id),0))}</td></tr>`;
+      });
+      // case maths always counts everyone, whatever the filter
+      const tots=its.map(i=>itemTotals(R,i.id)),f=ppl.length<everyone.length;
+      h+=`<tr class="foot"><td>Total${f?' <span class="note">(everyone)</span>':''}</td>${tots.map(t=>`<td>${t.total}</td>`).join('')}<td>${money(everyone.reduce((s,p)=>s+its.reduce((s2,i)=>s2+lineCost(i,p.id),0),0))}</td></tr>
+      <tr class="foot"><td>Per case</td>${its.map(i=>`<td>${i.incPerCase}</td>`).join('')}<td></td></tr>
+      <tr class="foot"><td>Cases</td>${tots.map(t=>`<td>${t.cases}</td>`).join('')}<td></td></tr>
+      <tr class="foot"><td>Variance</td>${tots.map((t,k)=>t.total===0?'<td>–</td>':t.aligned?'<td class="good">✓ 0</td>':`<td class="bad"><button class="btn sm" data-gap="${esc(its[k].id)}">${t.short} short · resolve</button></td>`).join('')}<td></td></tr></tbody></table></div>`;
     });
-    const tots=b.items.map(i=>itemTotals(R,i.id));
-    h+=`<tr class="foot"><td>Total</td>${tots.map(t=>`<td>${t.total}</td>`).join('')}<td>${money(ppl.reduce((s,p)=>s+b.items.reduce((s2,i)=>s2+personCost({blocks:[{items:[i]}],orders:R.orders},p.id).total,0),0))}</td></tr>
-    <tr class="foot"><td>Per case</td>${b.items.map(i=>`<td>${i.incPerCase}</td>`).join('')}<td></td></tr>
-    <tr class="foot"><td>Cases</td>${tots.map(t=>`<td>${t.cases}</td>`).join('')}<td></td></tr>
-    <tr class="foot"><td>Variance</td>${tots.map((t,k)=>t.total===0?'<td>–</td>':t.aligned?'<td class="good">✓ 0</td>':`<td class="bad"><button class="btn sm" data-gap="${esc(b.items[k].id)}">${t.short} short · resolve</button></td>`).join('')}<td></td></tr></tbody></table></div>`;
-  });
+    if(hidden)h+=`<div class="note" style="margin-top:8px">${hidden} item${hidden>1?'s':''} nobody ordered ${hidden>1?'are':'is'} hidden.</div>`;
+  }
   el.innerHTML=h;
+  el.querySelectorAll('[data-agf]').forEach(b=>b.onclick=()=>{AG.f=b.dataset.agf;agSave();adminGrid(el,R)});
+  $('#agSort').onchange=e=>{AG.sort=e.target.value;agSave();adminGrid(el,R)};
+  $('#agHide').onchange=e=>{AG.hide=e.target.checked;agSave();adminGrid(el,R)};
+  $('#agQ').oninput=e=>{AG.q=e.target.value;const pos=e.target.selectionStart;adminGrid(el,R);const n=$('#agQ');n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}};
+  const cp=$('#agCopy');if(cp)cp.onclick=()=>{const names=everyone.filter(p=>info[p.id].st==='none').map(p=>p.name).join(', ');
+    const fb=()=>openModal(`<h2>Not ordered yet</h2><div class="note">Copy these names:</div><textarea id="agNames" rows="5" style="width:100%;margin-top:8px" readonly>${esc(names)}</textarea><div class="row2" style="justify-content:flex-end"><button class="btn" id="agNX">Done</button></div>`,()=>{$('#agNX').onclick=closeModal;const t=$('#agNames');t.focus();t.select()});
+    try{navigator.clipboard.writeText(names).then(()=>toast(`Copied ${cnt.none} name${cnt.none>1?'s':''}`),fb)}catch(e){fb()}};
+  el.querySelectorAll('[data-jump]').forEach(r=>r.onclick=()=>{const t=el.querySelector(`tr[data-prow="${CSS.escape(r.dataset.jump)}"]`);if(!t)return;t.scrollIntoView({behavior:'smooth',block:'center'});t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash')});
   el.querySelectorAll('[data-gq]').forEach(i=>i.onchange=()=>{const[p,it]=i.dataset.gq.split('|'),item=findItem(R,it);if(!item)return;persist(setQtyLogged(R,p,item,i.value,true));rerenderKeepFocus()});
   el.querySelectorAll('[data-gap]').forEach(b=>b.onclick=()=>openGap(R.id,b.dataset.gap));
 }
